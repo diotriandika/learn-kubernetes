@@ -26,7 +26,29 @@ PS C:> kubectl version --client
 
 ### Creating Kubernetes Cluster using Minikube
 
+Sekarang kita dapat membuat cluster kubernetes dengan menggunakan minikube. Sebagai contoh dibawah saya akan membuat sebuah single node cluster kubernetes dengan driver virtualbox
 
+```powershell
+PS C:> minikube start --driver=virtualbox --memory=2000m --cpus=2 --disk-size="15000mb" --no-vtx-check
+```
+
+Menjalankan perintah diatas akan membuat sebuah single node kubernetes cluster dengan spesifikasi node 2gb ram, 2cpu & 15gb disk capacity divirtualbox. Kalian juga bisa menambahkan option `--no-vtx-check` untuk melewati validasi virtualization support yang biasanya tidak terdeteksi karena digunakan WSL2.
+
+Verifikasi dengan mengecek nodes yang tersedia menggunakan kubectl dan cek vm yang dibuat oleh minikube di virtualbox.
+
+```powershell
+PS C:> kubectl get nodes -A
+NAME       STATUS   ROLES           AGE     VERSION
+minikube   Ready    control-plane   2m14s   v1.30.0
+```
+
+![Screenshot 2024-07-02 130322](C:\Users\Dio Tri Andika\Pictures\Screenshots\Screenshot 2024-07-02 130322.png)
+
+Kita juga bisa membuat multi-node kubernetes cluster dengan menambahkan parameter `--nodes=<number-of-nodes>`
+
+```powershell
+PS C:> minikube start --driver=virtualbox --memory=2000m --cpus=2 --disk-size="15000mb" --nodes=5 --no-vtx-check
+```
 
 Full References:
 
@@ -34,4 +56,6 @@ Full References:
 - https://medium.com/containers-101/local-kubernetes-for-windows-minikube-vs-docker-desktop-25a1c6d3b766
 - https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
 - https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download
+- https://github.com/kubernetes/minikube/issues/3900
+- https://github.com/kubernetes/minikube/issues/16788
 
