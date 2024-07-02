@@ -28,7 +28,7 @@ PS C:> kubectl version --client
 
 
 
-Full Reference:
+Full References:
 
 - https://www.getambassador.io/blog/kubernetes-with-minikube-on-windows-home
 - https://medium.com/containers-101/local-kubernetes-for-windows-minikube-vs-docker-desktop-25a1c6d3b766
