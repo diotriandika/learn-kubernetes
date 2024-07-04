@@ -20,3 +20,22 @@ Kubernetes adalah aplikasi untuk automation deployment, scaling, dan manajemen a
 
 
 
+## Apa itu Node?
+
+- Node adalah worker machine di Kubernetes, sebelumnya ada yang menyebutnya Minion.
+- Node bisa saja dalam bentuk VM atau Mesin Fisik
+- Di dalam Node selalu terdapat Kubelet, kube-proxy dan container manager.
+
+## Apa itu Pod?
+
+- Pod adalah unit terkecil yang bisa dideploy di Kubernetes Cluster
+
+- Pod berisi satu atau lebih container
+
+- Secara sederhana Pod adalah aplikasi kita yang running di Kubernetes Cluster.
+
+- Pod tidak bisa running di Node yang berbeda
+
+  > ![image-20240704185919619](C:\Users\Dio Tri Andika\AppData\Roaming\Typora\typora-user-images\image-20240704185919619.png)
+
+- 
