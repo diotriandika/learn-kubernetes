@@ -84,3 +84,23 @@ Kita juga bisa melihat detail dari pod tersebut dengan menggunakan `kubectl desc
 $ kubectl describe pod nginx-pod
 ```
 
+### Mengakses Pod
+
+Untuk mengakses pod yang sudah dibuat, disini kita bisa menggunakan `kubectl port-forward` untuk menforward pord yang ditentukan ke port pod tersebut. Saat production ga make ini, jadi coba cari tau kenapa ga make ini di production well belum belajar sampe sana soalnya.
+
+```bash
+$ kubectl port-forward <pod-name> <access-port>:<pod-port>
+```
+
+untuk kasus pod diatas, nginx secara default mengexpose port 80, dan saya akan melakukan port-forward ke port 8080 untuk mengakses pod tersebut.
+
+```bash
+$ kubectl port-forward nginx-pod 8080:80
+Forwarding from 127.0.0.1:8080 -> 80
+Forwarding from [::1]:8080 -> 80
+```
+
+selanjutnya buka browser dan akses http://localhost:8080
+
+![image-20240704201649489](C:\Users\Dio Tri Andika\AppData\Roaming\Typora\typora-user-images\image-20240704201649489.png)
+
