@@ -70,7 +70,7 @@ NAME        READY   STATUS    RESTARTS   AGE
 nginx-pod   1/1     Running   0          5m56s
 ```
 
-atau agar lebih detail
+atau agar lebih lengkap
 
 ```bash
 $ kubectl get pod -o wide
@@ -78,5 +78,9 @@ NAME        READY   STATUS    RESTARTS   AGE     IP           NODE       NOMINAT
 nginx-pod   1/1     Running   0          8m19s   10.244.0.3   kube-pzn   <none>           <none>
 ```
 
+Kita juga bisa melihat detail dari pod tersebut dengan menggunakan `kubectl describe pod <pod-name>`
 
+```bash
+$ kubectl describe pod nginx-pod
+```
 
