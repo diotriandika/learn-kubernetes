@@ -94,5 +94,69 @@ nginx-pod-labels2   1/1     Running   0          3m9s
 
 maka yang muncul hanyalah pod yang memiliki label tersebut.
 
+### Annotation
 
+Untuk apa Annotation?
+
+- Annotation mirip dengan Label, hanya saja tidak dapat difilter atau diquery seperti label
+- Biasanya annotation digunakan untuk menambahkan informasi tambahan dalam ukuran besar
+- Annotation bisa menampung informasi sampai 256kb
+
+Contoh menggunakan Annotation pada Pod:
+
+```yaml
+apiVersion: v1 
+kind: Pod 
+metadata:
+  name: nginx-pod-annotation
+  labels:
+    team: ceker-ayam
+  annotations:
+    description: Aplikasi ini dikembangkan oleh tim ceker-ayam
+spec:
+  containers:
+    - name: nginx
+      image: nginx:latest
+      ports:
+        - containerPort: 80
+```
+
+Kita bisa cek annotations dari sebuah Pod dengan menggunakan `kubectl describe pod <pod-name>`
+
+```bash
+$ kubectl describe pod nginx-pod-annotation
+Name:             nginx-pod-annotation
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             kube-pzn-cluster/192.168.59.112
+Start Time:       Sat, 20 Jul 2024 13:36:37 +0800
+Labels:           team=ceker-ayam
+Annotations:      description: Aplikasi ini dikembangkan oleh tim ceker-ayam
+Status:           Running
+IP:               10.244.0.3
+```
+
+Diatas kita bisa melihat Annotations yang kita sisipkan pada pod nignx-pod-annotation. 
+
+Kita juga bisa menambahkan annotation pada Pod dengan menggunakan `kubectl annotate pod <pod-name> key="value" `
+
+### Namespace
+
+Kapan menggunakan Namespace?
+
+- Ketika resources di Kubernetes sudah terlalu banyak
+- Ketika butuh memisahkan resources untuk multi-tenant, team atau environment.
+- Nama resources bisa sama jika berada di namespace yang berbeda
+
+Untuk melihat namespace kita bisa menggunakan `kubectl get namespaces`
+
+```bash
+$ kubectl get namespaces
+NAME              STATUS   AGE
+default           Active   56m
+kube-node-lease   Active   56m
+kube-public       Active   56m
+kube-system       Active   56m
+```
 
