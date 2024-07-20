@@ -160,3 +160,23 @@ kube-public       Active   56m
 kube-system       Active   56m
 ```
 
+Jika kita membuat resource tanpa mendefinisikan Namespace, kubernetes akan memasukan resource tersebut ke namespace `default`.
+
+Untuk melihat namespace pada sebuah resource, kita bisa menggunakan `kubectl describe`
+
+```bash 
+$ kubectl describe pod nginx-pod-annotation
+Name:             nginx-pod-annotation
+Namespace:        default
+Priority:         0
+Service Account:  default
+```
+
+Kita juga bisa melihat list pod yang ada disebuah namespace dengan cara menggunakan `kubectl get --namespace <namespace-name>`
+
+```bash
+$ kubectl get --namespace default
+NAME                   READY   STATUS    RESTARTS   AGE
+nginx-pod-annotation   1/1     Running   0          39m
+```
+
