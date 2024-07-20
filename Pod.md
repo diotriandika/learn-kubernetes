@@ -1,7 +1,5 @@
 ## Pod
 
-
-
 Melihat list pod yang ada
 
 ```bash
@@ -84,7 +82,7 @@ Kita juga bisa melihat detail dari pod tersebut dengan menggunakan `kubectl desc
 $ kubectl describe pod nginx-pod
 ```
 
-### Mengakses Pod
+### Mengakses Pod (hanya untuk testing, selengkapnya ada di Resource Services)
 
 Untuk mengakses pod yang sudah dibuat, disini kita bisa menggunakan `kubectl port-forward` untuk menforward pord yang ditentukan ke port pod tersebut. Saat production ga make ini, jadi coba cari tau kenapa ga make ini di production well belum belajar sampe sana soalnya.
 
@@ -103,4 +101,25 @@ Forwarding from [::1]:8080 -> 80
 selanjutnya buka browser dan akses http://localhost:8080
 
 ![image-20240704201649489](C:\Users\Dio Tri Andika\AppData\Roaming\Typora\typora-user-images\image-20240704201649489.png)
+
+### Menghapus Pod
+
+Untuk dapat menghapus sebuah pod atau lebih, kita bisa menggunakan `kubectl delete pod <pod-name>` & `kubectl delete pod <pod-name1> <pod-name2> <pod-name3>`. Untuk menghapus semua pod dinamespace default `kubectl delete pod --all`  
+
+```bash
+$ kubectl delete pod nginx-pod
+pod "nginx-pod" deleted
+```
+
+Menghapus Pod yang menggunakan Label
+
+```bash
+$ kubectl delete pod --labels label-key1="label-value1"
+```
+
+Menghapus semua Pod yang ada di sebuah Namespace
+
+```bash
+$ kubectl delete pod --all --namespace <namespace-name>
+```
 
