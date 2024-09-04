@@ -180,3 +180,22 @@ NAME                   READY   STATUS    RESTARTS   AGE
 nginx-pod-annotation   1/1     Running   0          39m
 ```
 
+### Probe
+
+Probe merupakan pengecekan **nanti cari lengkapnya**
+
+#### Liveness, Readiness & Startup Probe
+
+- Kubelet menggunakan liveness probe untuk mengecek kapan perlu merestart Pod.
+- Misal saat liveness probe pada Pod tidak merespon, kubelet akan secara otomatis me-restart Pod.
+- Kubelet menggunakan readiness probe untuk mengecek apakah Pod siap menerima traffic.
+- Kubelet menggunakan startup probe untuk mengecek apakah Pod sudah berjalan. Jika belum berjalan, maka kubelet tidak akan menggunakan pengecekan liveness dan readiness.
+- Startup Probe cocok untuk Pod yang membutuhkan proses startup yang lama, ini dapat digunakan untuk memastikan Pod tidak mati oleh kubelet sebelum selesai berjalan dengan sa.
+
+Di kubernetes, terdapat 3 mekanisme pengecekan Probe, yakni:
+
+- HTTP Get
+- TCP Socket
+- Command Exec
+
+
