@@ -76,7 +76,7 @@ $ minikube start --driver=virtualbox --memory=2000m --cpus=2 --disk-size="15000m
 Jika ingin menggunakan driver kvm2 atau lainnya secara default, jalankan command dibawah
 
 ```bash
-$ minikube config set driver kvm
+$ minikube config set driver kvm2
 ```
 
 Verifikasi dengan menjalankan 
