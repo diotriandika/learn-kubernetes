@@ -17,7 +17,7 @@ Specs:
 
 Topology: 
 
-![image-20240906113142948](C:\Users\Dio Tri Andika\AppData\Roaming\Typora\typora-user-images\image-20240906113142948.png)
+![image-20240906113142948](https://github.com/user-attachments/assets/d72563b2-1959-4abb-a6bd-c118da26f535)
 
 ## Setup Load Balancer
 
@@ -157,6 +157,53 @@ Referensi:
 - https://saurabhkharkate05.medium.com/kubernetes-cluster-setup-with-containerd-945214a0d02c
 
 ### Step 2 - Kubernetes Installation
+
+#### Jalankan di semua Master dan Worker Node!!
+
+Dalam menginisasi/memulai sebuah cluster kubernetes diperlukan 3 tool yang wajib diinstal disetiap node, yakni kubeadm, kubelet dan kubectl
+
+> Quick Info: 
+>
+> - Kubeadm adalah sebuah tool yang digunakan untuk membuat cluster kubernetes, terdapat 2 command krusial yang digunakan yaitu `kubeadm init` yang digunakan untuk menginisiasi sebuah cluster dan `kubeadm join` digunakan untuk bergabung ke cluster yang sudah dibuat. [Lengkapnya disini.](https://kubernetes.io/docs/reference/setup-tools/kubeadm/)
+> - Kubectl adalah sebuah command-line tool yang digunakan untuk berkomunikasi dengan Kubernetes Cluster  Control Plane. [Lengkapnya disini.](https://kubernetes.io/docs/reference/kubectl/)
+> - Kubelet adalah sebuah `node-agent` yang nantinya berjalan disetiap worker-node dalam cluster. Kubelet memastikan container beroperasi didalam Pod. [Lengkapnya disini.](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)
+
+Untuk melakukan instalasti ketiga tools diatas, download public signing key untuk package repository kubernetes kemudian tampahkan apt repository kubernetes.
+
+```bash
+# Download public signing key kubernetes
+$ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+# Add Kubernetes apt repository
+$ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+```
+
+Update current repository lalu install `kubectl`, `kubeadm` dan `kubelet`.
+
+```bash
+# Update current repository packages
+$ sudo apt-get update
+
+# Install kubectl, kubelet and kubeadm
+$ sudo apt-get install kubectl kubelet kubeadm -y
+
+# Prevent the package for being automatically updated
+$ sudo apt-mark hold kubectl kubeadm kubelet
+```
+
+Enable service kubelet
+
+```bash
+$ sudo systemctl enable --now kubelet
+```
+
+Referensi : 
+
+- https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+
+
+
 
 
 
