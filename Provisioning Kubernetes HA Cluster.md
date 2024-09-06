@@ -288,8 +288,7 @@ $ sudo kubeadm join load-balancer.local:6443 --token rwarnf.sexqk4fch679te97 --d
 
 Jika sudah maka akan terdapat output seperti dibawah, dan jika kita melist node dalam cluster akan terlihat seluruh nodes yang sudah digabungkan sebelumnya.
 
-![image-20240906180006232](https://github.com/user-attachments/assets/bccdabe2-01ba-462d-9bfa-8e6d283d2f30)
-
+![image-20240906180006232](https://github.com/user-attachments/assets/2a5f23fd-a39f-48d5-b7b8-496149d28f83)
 
 > Notes : Ingat untuk menjalankan command dibawah setelah berhasil join pada `k8s-master-2` agar dapat menggunakan tools `kubectl`.
 >
@@ -341,27 +340,62 @@ Disini saya menggunakan [Calico](https://docs.tigera.io/calico/latest/getting-st
 Masuk ke salah satu control-plane, lalu jalankan perintah dibawah
 
 ```bash
-$ 
+# Download calico networking manifest for the Kubernetes API
+$ curl https://raw.githubusercontent.com/projectcalico/calico/v3.28.1/manifests/calico.yaml -O
 ```
 
+Gunakan `kubectl apply` atau `kubectl create` untuk membuat resources calico.
+
+```bash
+$ kubectl create -f calico.yaml
+```
+
+Tunggu hingga semua resource dan object calico berjalan, kita bisa melihat secara realtime dengan menggunakan `watch`
+
+```bash
+$ watch kubectl get all --all-namespaces
+```
+
+Jika sudah maka seharusnya semua Pod saat ini dalam status running
+
+```bash
+$ kubectl get pod -A
+NAMESPACE     NAME                                       READY   STATUS    RESTARTS   AGE
+kube-system   calico-kube-controllers-7fbd86d5c5-tllzj   1/1     Running   0          12m
+kube-system   calico-node-5mxws                          1/1     Running   0          12m
+kube-system   calico-node-95t2f                          1/1     Running   0          12m
+kube-system   calico-node-gs4cj                          1/1     Running   0          12m
+kube-system   calico-node-m2ztj                          1/1     Running   0          12m
+kube-system   coredns-6f6b679f8f-42zgx                   1/1     Running   0          89m
+kube-system   coredns-6f6b679f8f-zt789                   1/1     Running   0          89m
+```
+
+dan juga nodes dalam keadaan ready
+
+```bash
+$ kubectl get nodes
+NAME           STATUS   ROLES           AGE   VERSION
+k8s-master-1   Ready    control-plane   90m   v1.31.0
+k8s-master-2   Ready    control-plane   89m   v1.31.0
+k8s-worker-1   Ready    <none>          86m   v1.31.0
+k8s-worker-2   Ready    <none>          86m   v1.31.0
+```
+
+Referensi :
+
+- https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
+- https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/
+- https://learn.microsoft.com/en-us/azure/aks/concepts-network-cni-overview
 
 
- 
 
-
-
-
-
-
-
-
-
-Semua Referensi:
+Referensi global:
 
 - https://medium.com/@sven_50828/setting-up-a-high-availability-kubernetes-cluster-with-multiple-masters-31eec45701a2
 - https://overcast.blog/disaster-recovery-and-high-availability-in-kubernetes-a-guide-21996d80ac39
 - https://avinetworks.com/glossary/kubernetes-load-balancer/
 - https://facsiaginsa.com/kubernetes/haproxy-for-k8s-load-balancer
 - https://kubernetes.io/docs/concepts/security/controlling-access/
-- 
+- https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises
+- https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
 
