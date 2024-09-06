@@ -127,14 +127,15 @@ $ sudo apt-get update & sudo apt-get install containerd.io
 Buat configuration file default dari containerd
 
 ```bash
-$ sudo mkdir -p /etc/containerd
-$ sudo containerd config default | sudo tee /etc/containerd/config.toml
+$ sudo su -
+$ mkdir -p /etc/containerd
+$ containerd config default | sudo tee /etc/containerd/config.toml
 ```
 
 Selanjutnya set containerd configuration file diatas agar  `cgroupDriver` untuk runc diset ke systemd yang mana nantinya diperlukan oleh kubelet.
 
 ```bash
-$ sudo sed -i '/SystemdCgroup/s/false/true/g' /etc/containerd/config.toml
+$ sed -i '/SystemdCgroup/s/false/true/g' /etc/containerd/config.toml
 ```
 
 Restart containerd dan cek apakah containerd sudah berjalan atau tidak serta enable startup to system boot.
@@ -200,6 +201,152 @@ $ sudo systemctl enable --now kubelet
 Referensi : 
 
 - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+### Step 3 - Initializing High Availability Kubernetes Cluster
+
+Untuk dapat menginisiasi sebuah cluster kubernetes, pastikan terlebih dahulu bahwa semua host dapat menagkses images dari kubernetes container registry `registry.k8s.io` .
+
+> Note: Matikan swap pada setiap node, karena hingga saat ini kubernetes tidak mensupport system yang menggunakan swap. Jika ingin tetap menggunakan swap system, bisa [baca disini.](https://stackoverflow.com/questions/47094861/error-while-executing-and-initializing-kubeadm#:~:text=To%20install%20kubeadm%20with%20swap%20enabled%3A)
+
+Ada juga prequisites yang perlu diingat sebelum menginisasi high available cluster kubernetes, bisa [baca disini.](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/#:~:text=for%20both%20methods-,Create%20load%20balancer%20for%20kube%2Dapiserver,-Note%3A)
+
+#### Execute di k8s-master-1! (run as root)
+
+Initialize k8s-master-node1 untuk mulai membuat cluster, 
+
+```bash
+$ kubeadm init --control-plane-endpoint "load-balancer.local:6443" --upload-certs
+```
+
+> `load-balancer.local` merupakan dns dari load balancer. Kita bisa menggunakan IP langsung, namun direkomendasikan untuk menggunakan dns terutama dienvironment cloud. [Lengkapnya disini.](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/#:~:text=It%20is%20not%20recommended%20to%20use%20an%20IP%20address%20directly%20in%20a%20cloud%20environment.)
+
+Jika berjalan dengan normal, akan terdapat output panjang. Namun yang perlu diperhatikan adalah list dibawah.
+
+```bash
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+========================
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+========================
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+  
+# Token for Control Plane
+========================
+You can now join any number of the control-plane node running the following command on each as root:
+
+  kubeadm join load-balancer.local:6443 --token rwarnf.sexqk4fch679te97 \
+        --discovery-token-ca-cert-hash sha256:37efc6521fedbd57d7773696d789441e0d0fed5a7a801d66ffeb11bc4890bd05 \                                                                                                    --control-plane --certificate-key 9c2b6f375b12e03588e3bbe48de4cee92f15979a037470297ab9dca7ef9fc052
+=========================
+
+# Token for Worker Nodes
+=========================
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join load-balancer.local:6443 --token rwarnf.sexqk4fch679te97 \
+        --discovery-token-ca-cert-hash sha256:37efc6521fedbd57d7773696d789441e0d0fed5a7a801d66ffeb11bc
+ ========================
+```
+
+Sesuai petunjuk diatas, untuk memulai cluster dengan user regular (non-root user) kita perlu mengeksekusi perintah dibawah
+
+```bash
+# run as non-root user
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+Perintah diatas bertujuan untuk menyalin `kubectl` config file ke home directory agar kita bisa mengontrol cluster kubernetes dengan tool kubectl.
+
+Verifikasi dengan menjalankan 
+
+```bash
+$ kubectl get nodes
+NAME           STATUS     ROLES           AGE     VERSION
+k8s-master-1   NotReady   control-plane   3m45s   v1.31.0
+```
+
+Selanjutnya terdapat 2 hal penting lagi untuk membangun cluster, yakni section `kubeadm join`. Terdapat dua jenis member untuk bergabung ke cluster, yakni member dengan roles control plane dan worker node. 
+
+Perhatikan **output diterminal**, akan terdapat output mirip seperti dibawah. **Eksekusi** output tersebut sesuai dengan infrastructure masing-masing. 
+
+```bash
+# Run this on the other Master-Nodes instantes (k8s-master-2) to join the cluster as Control-Plane.
+$ sudo kubeadm join load-balancer.local:6443 --tokenrwarnf.sexqk4fch679te97 --discovery-token-ca-cert-hash sha256:37efc6521fedbd57d7773696d789441e0d0fed5a7a801d66ffeb11bc4890bd05 --control-plane --certificate-key 9c2b6f375b12e03588e3bbe48de4cee92f15979a037470297ab9dca7ef9fc052
+       
+       
+# Run this on each Worker-Nodes available (k8s-worker-1 & k8s-worker-2) to join the cluster as worker nodes.
+$ sudo kubeadm join load-balancer.local:6443 --token rwarnf.sexqk4fch679te97 --discovery-token-ca-cert-hash sha256:37efc6521fedbd57d7773696d789441e0d0fed5a7a801d66ffeb11bc
+```
+
+> Note: jika terdapat spasi karena melakukan copy melalui terminal, perlu diperhatikan untuk memperbaiki spacing tersebut untuk meminimalisir terjadinya error.
+
+Jika sudah maka akan terdapat output seperti dibawah, dan jika kita melist node dalam cluster akan terlihat seluruh nodes yang sudah digabungkan sebelumnya.
+
+![image-20240906180006232](https://github.com/user-attachments/assets/bccdabe2-01ba-462d-9bfa-8e6d283d2f30)
+
+
+> Notes : Ingat untuk menjalankan command dibawah setelah berhasil join pada `k8s-master-2` agar dapat menggunakan tools `kubectl`.
+>
+> ```bash
+> # run as non-root user
+> mkdir -p $HOME/.kube
+> sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+> sudo chown $(id -u):$(id -g) $HOME/.kube/config
+> ```
+
+```bash
+# Use kubectl to list available nodes on the current cluster (exec on control plane)
+$ kubectl get nodes
+NAME           STATUS     ROLES           AGE     VERSION
+k8s-master-1   NotReady   control-plane   4m56s   v1.31.0
+k8s-master-2   NotReady   control-plane   3m41s   v1.31.0
+k8s-worker-1   NotReady   <none>          81s     v1.31.0
+k8s-worker-2   NotReady   <none>          61s     v1.31.0
+```
+
+Kita lihat diatas bahwa semua nodes dalam status NotReady, ini dikarenakan dalam cluster tersebut belum ada CNI yang berjalan. 
+
+```bash
+$ kubectl get pod -A -o wide
+NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE     IP           NODE           NOMINATED NODE   READINESS GATES
+kube-system   coredns-6f6b679f8f-42zgx               0/1     Pending   0          10m     <none>       <none>         <none>           <none>
+kube-system   coredns-6f6b679f8f-zt789               0/1     Pending   0          10m     <none>       <none>         <none>           <none>
+kube-system   etcd-k8s-master-1                      1/1     Running   4          10m     10.20.1.10   k8s-master-1   <none>           <none>
+kube-system   etcd-k8s-master-2                      1/1     Running   2          9m29s   10.20.1.11   k8s-master-2   <none>           <none>
+kube-system   kube-apiserver-k8s-master-1            1/1     Running   4   
+...
+```
+
+Referensi :
+
+- https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
+- https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/#config-file
+- https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
+- https://github.com/ruzickap/multinode_kubernetes_cluster/blob/master/docs/source/01-k8s-installation.rst
+
+### Step 4 - Installing CNI Plugin
+
+Dikutip dari [kubernetes.io](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/), CNI atau Container Network Interface dalam konteks networking adalah sebuah daemon dalam pada node yang dikonfigurasi untuk menyediakan CRI Services untuk kubelet. Khususnya, Container Runtime harus dikonfigurasi untuk memuat Plugins CNI yang diperlukan untuk dapat mengimplementasikan [Kubernetes Network Model](https://kubernetes.io/docs/concepts/services-networking/#the-kubernetes-network-model). 
+
+Kubernetes menggunakan Plugin CNI untuk mengelola network di cluster Kubernetes. CNI bertugas untuk mengelola pengalamatan alamat IP ke Pod, network routing antara Pod, Kubernetes service routing, dan lainnya.
+
+Disini saya menggunakan [Calico](https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises) sebagai CNI karena proses pemasangannya & managemennya terbilang mudah. Calico memiliki 2 cara dalam proses intsalasinya, yakni Calico Operator yang menggunakan custom resources untuk mengatur lifecycle dari calico itu sendiri, dan satunya adalah Manifest yang dimana Calico akan diinstall secara langsung sebagai resources Kubernetes. [Lengkapnya disini](https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises)
+
+Masuk ke salah satu control-plane, lalu jalankan perintah dibawah
+
+```bash
+$ 
+```
+
+
+
+ 
 
 
 
