@@ -37,7 +37,7 @@ Edit configuration file `/etc/haproxy/haproxy.cfg` dan sesuaikan seperti dibawah
 $ sudo nano /etc/haproxy/haproxy.cfg
 ---
 defaults
-		...
+        ...
 frontend k8s-master-frontend
         bind :6443
         mode tcp
