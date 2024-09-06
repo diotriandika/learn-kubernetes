@@ -1,6 +1,6 @@
 ## Provisioning Kubernetes HA Cluster
 
-Sebuah Cluster HA (High Availability) terdiri dari kumpulan (minimal 2) control plane (master nodes), worker nodes dan sebuah loadbalancer. Control Plane atau Master Nodes adalah inti dari sebuah Kubernetes cluster yang memanage semua operasi di cluster tersebut. Ada kalanya master nodes tersebut down dan jika kita menggunakan Single-Node Control Plane, sudah dipastikan cluster tersebut juga akan mati berserta semua aplikasi yang berjalan didalamnya atau worst-casenya data hilang. Maka dari itu sangatlah penting membuat infrastruktur kubernetes cluster yang menggunakan High Availability atau Multi-Node Control Plane untuk meminimalisir terjadinya downtime. 
+Sebuah Cluster HA (High Availability) terdiri dari kumpulan (minimal 3) control plane (master nodes), worker nodes dan sebuah loadbalancer. Control Plane atau Master Nodes adalah inti dari sebuah Kubernetes cluster yang memanage semua operasi di cluster tersebut. Ada kalanya master nodes tersebut down dan jika kita menggunakan Single-Node Control Plane, sudah dipastikan cluster tersebut juga akan mati berserta semua aplikasi yang berjalan didalamnya atau worst-casenya data hilang. Maka dari itu sangatlah penting membuat infrastruktur kubernetes cluster yang menggunakan High Availability atau Multi-Node Control Plane untuk meminimalisir terjadinya downtime. 
 
 ## Infrastructure
 
@@ -9,7 +9,7 @@ Specs:
 | Requirements  | Specs       |
 | ------------- | ----------- |
 | Load Balancer | 1 Nodes     |
-| Control Plane | 2 Nodes     |
+| Control Plane | 3 Nodes     |
 | Worker        | 2 Nodes     |
 | RAM           | 4096Mi each |
 | CPUs          | 2           |
@@ -17,7 +17,7 @@ Specs:
 
 Topology: 
 
-![image-20240906113142948](https://github.com/user-attachments/assets/d72563b2-1959-4abb-a6bd-c118da26f535)
+![image](https://github.com/user-attachments/assets/dbb21e5e-14f4-49d7-a355-8f42dce666e6)
 
 ## Setup Load Balancer
 
