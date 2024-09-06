@@ -51,6 +51,7 @@ backend k8s-master-backend
         default-server inter 10s downinter 5s
         server k8s-master-1 10.20.1.10:6443 check
         server k8s-master-2 10.20.1.11:6443 check
+        server k8s-master-3 10.20.1.12:6443 check
 ```
 
 > Notes: Port `6443` merupakan port dari Kubernetes API Server. [Reference here](https://kubernetes.io/docs/concepts/security/controlling-access/)
@@ -276,7 +277,7 @@ Selanjutnya terdapat 2 hal penting lagi untuk membangun cluster, yakni section `
 Perhatikan **output diterminal**, akan terdapat output mirip seperti dibawah. **Eksekusi** output tersebut sesuai dengan infrastructure masing-masing. 
 
 ```bash
-# Run this on the other Master-Nodes instantes (k8s-master-2) to join the cluster as Control-Plane.
+# Run this on the other Master-Nodes instantes (k8s-master-2 & k8s-master-3) to join the cluster as Control-Plane.
 $ sudo kubeadm join load-balancer.local:6443 --tokenrwarnf.sexqk4fch679te97 --discovery-token-ca-cert-hash sha256:37efc6521fedbd57d7773696d789441e0d0fed5a7a801d66ffeb11bc4890bd05 --control-plane --certificate-key 9c2b6f375b12e03588e3bbe48de4cee92f15979a037470297ab9dca7ef9fc052
        
        
@@ -288,9 +289,9 @@ $ sudo kubeadm join load-balancer.local:6443 --token rwarnf.sexqk4fch679te97 --d
 
 Jika sudah maka akan terdapat output seperti dibawah, dan jika kita melist node dalam cluster akan terlihat seluruh nodes yang sudah digabungkan sebelumnya.
 
-![image-20240906180006232](https://github.com/user-attachments/assets/2a5f23fd-a39f-48d5-b7b8-496149d28f83)
+![image-20240906180006232](https://github.com/user-attachments/assets/e3209a2c-2635-4ee3-9c9b-3fcbb6229896)
 
-> Notes : Ingat untuk menjalankan command dibawah setelah berhasil join pada `k8s-master-2` agar dapat menggunakan tools `kubectl`.
+> Notes : Ingat untuk menjalankan command dibawah setelah berhasil join pada `k8s-master-2` & `k3s-master-3` agar dapat menggunakan tools `kubectl`.
 >
 > ```bash
 > # run as non-root user
@@ -305,6 +306,7 @@ $ kubectl get nodes
 NAME           STATUS     ROLES           AGE     VERSION
 k8s-master-1   NotReady   control-plane   4m56s   v1.31.0
 k8s-master-2   NotReady   control-plane   3m41s   v1.31.0
+k8s-master-3   NotReady   control-plane   3m55s   v1.31.0
 k8s-worker-1   NotReady   <none>          81s     v1.31.0
 k8s-worker-2   NotReady   <none>          61s     v1.31.0
 ```
@@ -316,9 +318,7 @@ $ kubectl get pod -A -o wide
 NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE     IP           NODE           NOMINATED NODE   READINESS GATES
 kube-system   coredns-6f6b679f8f-42zgx               0/1     Pending   0          10m     <none>       <none>         <none>           <none>
 kube-system   coredns-6f6b679f8f-zt789               0/1     Pending   0          10m     <none>       <none>         <none>           <none>
-kube-system   etcd-k8s-master-1                      1/1     Running   4          10m     10.20.1.10   k8s-master-1   <none>           <none>
-kube-system   etcd-k8s-master-2                      1/1     Running   2          9m29s   10.20.1.11   k8s-master-2   <none>           <none>
-kube-system   kube-apiserver-k8s-master-1            1/1     Running   4   
+kube-system   etcd-k8s-master-1                      1/1     Running   4          10m     10.20.1.10   k8s-master-1   <none>           <none>  
 ...
 ```
 
@@ -374,11 +374,12 @@ dan juga nodes dalam keadaan ready
 
 ```bash
 $ kubectl get nodes
-NAME           STATUS   ROLES           AGE   VERSION
-k8s-master-1   Ready    control-plane   90m   v1.31.0
-k8s-master-2   Ready    control-plane   89m   v1.31.0
-k8s-worker-1   Ready    <none>          86m   v1.31.0
-k8s-worker-2   Ready    <none>          86m   v1.31.0
+NAME           STATUS   ROLES           AGE     VERSION
+k8s-master-1   Ready    control-plane   3h29m   v1.31.0
+k8s-master-2   Ready    control-plane   3h28m   v1.31.0
+k8s-master-3   Ready    control-plane   3m55s   v1.31.0
+k8s-worker-1   Ready    <none>          3h26m   v1.31.0
+k8s-worker-2   Ready    <none>          3h25m   v1.31.0
 ```
 
 Referensi :
