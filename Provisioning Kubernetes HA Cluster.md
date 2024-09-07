@@ -122,7 +122,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Update current repository & install containerd
-$ sudo apt-get update & sudo apt-get install containerd.io
+sudo apt-get update && sudo apt-get install containerd.io -y
 ```
 
 Buat configuration file default dari containerd
