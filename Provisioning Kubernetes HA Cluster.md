@@ -59,7 +59,7 @@ backend k8s-master-backend
 Reload konfigurasi dengan merestart service HAProxy & enable haproxy startup at boot.
 
 ```bash
-sudo systemctl restart haproxy && sudo systemctl enable haproxy
+$ sudo systemctl restart haproxy && sudo systemctl enable haproxy
 ```
 
 Referensi:
@@ -102,7 +102,7 @@ EOF
 Apply semua perubahan parameter `sysctl` tanpa reboot.
 
 ```bash
-sudo sysctl --system
+$ sudo sysctl --system
 ```
 
 Selanjutnya install package-package yang diperlukan untuk menggunakan repository melaui HTTPS dan tambahkan apt-key serta repository yang dibutuhkan untuk instalasi containerd.
@@ -197,7 +197,7 @@ sudo apt-mark hold kubectl kubeadm kubelet
 Enable service kubelet
 
 ```bash
-sudo systemctl enable --now kubelet
+$ sudo systemctl enable --now kubelet
 ```
 
 Referensi : 
@@ -206,9 +206,9 @@ Referensi :
 
 ### Step 3 - Initializing High Availability Kubernetes Cluster
 
-Untuk dapat menginisiasi sebuah cluster kubernetes, pastikan terlebih dahulu bahwa semua host dapat menagkses images dari kubernetes container registry `registry.k8s.io` .
+Untuk dapat me        nginisiasi sebuah cluster kubernetes, pastikan terlebih dahulu bahwa semua host dapat menagkses images dari kubernetes container registry `registry.k8s.io` .
 
-> Note: Matikan swap pada setiap node, karena hingga saat ini kubernetes tidak mensupport system yang menggunakan swap. Jika ingin tetap menggunakan swap system, bisa [baca disini.](https://stackoverflow.com/questions/47094861/error-while-executing-and-initializing-kubeadm#:~:text=To%20install%20kubeadm%20with%20swap%20enabled%3A)
+**IMPORTANT NOTE:** Matikan swap pada setiap node, karena hingga saat ini kubernetes tidak mensupport system yang menggunakan swap. Jika ingin tetap menggunakan swap system, bisa [baca disini.](https://stackoverflow.com/questions/47094861/error-while-executing-and-initializing-kubeadm#:~:text=To%20install%20kubeadm%20with%20swap%20enabled%3A)
 
 Ada juga prequisites yang perlu diingat sebelum menginisasi high available cluster kubernetes, bisa [baca disini.](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/#:~:text=for%20both%20methods-,Create%20load%20balancer%20for%20kube%2Dapiserver,-Note%3A)
 
@@ -217,7 +217,7 @@ Ada juga prequisites yang perlu diingat sebelum menginisasi high available clust
 Initialize k8s-master-node1 untuk mulai membuat cluster, 
 
 ```bash
-kubeadm init --control-plane-endpoint "load-balancer.local:6443" --upload-certs
+$ kubeadm init --control-plane-endpoint "load-balancer.local:6443" --upload-certs
 ```
 
 > `load-balancer.local` merupakan dns dari load balancer. Kita bisa menggunakan IP langsung, namun direkomendasikan untuk menggunakan dns terutama dienvironment cloud. [Lengkapnya disini.](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/#:~:text=It%20is%20not%20recommended%20to%20use%20an%20IP%20address%20directly%20in%20a%20cloud%20environment.)
@@ -268,7 +268,7 @@ Perintah diatas bertujuan untuk menyalin `kubectl` config file ke home directory
 Verifikasi dengan menjalankan 
 
 ```bash
-kubectl get nodes
+$ kubectl get nodes
 NAME           STATUS     ROLES           AGE     VERSION
 k8s-master-1   NotReady   control-plane   3m45s   v1.31.0
 ```
@@ -303,7 +303,7 @@ Jika sudah maka akan terdapat output seperti dibawah, dan jika kita melist node 
 
 ```bash
 # Use kubectl to list available nodes on the current cluster (exec on control plane)
-kubectl get nodes
+$ kubectl get nodes
 NAME           STATUS     ROLES           AGE     VERSION
 k8s-master-1   NotReady   control-plane   4m56s   v1.31.0
 k8s-master-2   NotReady   control-plane   3m41s   v1.31.0
@@ -315,7 +315,7 @@ k8s-worker-2   NotReady   <none>          61s     v1.31.0
 Kita lihat diatas bahwa semua nodes dalam status NotReady, ini dikarenakan dalam cluster tersebut belum ada CNI yang berjalan. 
 
 ```bash
-kubectl get pod -A -o wide
+$ kubectl get pod -A -o wide
 NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE     IP           NODE           NOMINATED NODE   READINESS GATES
 kube-system   coredns-6f6b679f8f-42zgx               0/1     Pending   0          10m     <none>       <none>         <none>           <none>
 kube-system   coredns-6f6b679f8f-zt789               0/1     Pending   0          10m     <none>       <none>         <none>           <none>
@@ -360,7 +360,7 @@ watch kubectl get all --all-namespaces
 Jika sudah maka seharusnya semua Pod saat ini dalam status running
 
 ```bash
-kubectl get pod -A
+$ kubectl get pod -A
 NAMESPACE     NAME                                       READY   STATUS    RESTARTS   AGE
 kube-system   calico-kube-controllers-7fbd86d5c5-tllzj   1/1     Running   0          12m
 kube-system   calico-node-5mxws                          1/1     Running   0          12m
@@ -374,7 +374,7 @@ kube-system   coredns-6f6b679f8f-zt789                   1/1     Running   0    
 dan juga nodes dalam keadaan ready
 
 ```bash
-kubectl get nodes
+$ kubectl get nodes
 NAME           STATUS   ROLES           AGE     VERSION
 k8s-master-1   Ready    control-plane   3h29m   v1.31.0
 k8s-master-2   Ready    control-plane   3h28m   v1.31.0
