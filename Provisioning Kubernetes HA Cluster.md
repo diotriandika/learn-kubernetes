@@ -28,7 +28,7 @@ Load balancer disini diperlukan untuk memproses semua traffic masuk kedalam clus
 Update packages repository untuk memastikan semua package dalam versi terbaru, kemudian install haproxy di **Node Load Balancer.**
 
 ```bash
-$ sudo apt-get update && sudo apt-get install -y
+sudo apt-get update && sudo apt-get install haproxy -y
 ```
 
 Edit configuration file `/etc/haproxy/haproxy.cfg` dan sesuaikan seperti dibawah (letakan dibawah option defaults)
@@ -59,7 +59,7 @@ backend k8s-master-backend
 Reload konfigurasi dengan merestart service HAProxy & enable haproxy startup at boot.
 
 ```bash
-$ sudo systemctl restart haproxy && sudo systemctl enable haproxy
+sudo systemctl restart haproxy && sudo systemctl enable haproxy
 ```
 
 Referensi:
@@ -102,7 +102,7 @@ EOF
 Apply semua perubahan parameter `sysctl` tanpa reboot.
 
 ```bash
-$ sudo sysctl --system
+sudo sysctl --system
 ```
 
 Selanjutnya install package-package yang diperlukan untuk menggunakan repository melaui HTTPS dan tambahkan apt-key serta repository yang dibutuhkan untuk instalasi containerd.
@@ -197,7 +197,7 @@ sudo apt-mark hold kubectl kubeadm kubelet
 Enable service kubelet
 
 ```bash
-$ sudo systemctl enable --now kubelet
+sudo systemctl enable --now kubelet
 ```
 
 Referensi : 
