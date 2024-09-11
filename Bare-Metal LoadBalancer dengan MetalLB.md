@@ -171,5 +171,11 @@ Commercial support is available at
 </html>
 ```
 
+Referensi:
 
-
+- https://medium.com/@maulanamalikjb147/metallb-kubernetes-990b3e5227d1
+- https://metallb.universe.tf/installation/
+- https://metallb.universe.tf/concepts/bgp/
+- https://metallb.universe.tf/configuration/
+- https://docs.redhat.com/en/documentation/openshift_container_platform/4.10/html/networking/load-balancing-with-metallb#about-metallb
+- https://ubuntu.com/kubernetes/docs/metallb
