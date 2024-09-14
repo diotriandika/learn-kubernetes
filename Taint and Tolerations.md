@@ -1,6 +1,6 @@
 ## Taints and Tolerations Overview
 
-Dalam kuberentes, Taints and Tolerations digunakan untuk mengontrol penjadwalan Pod ke nodes dalam cluster. Kedua hal tersebut membantu untuk memastikan bahwa hanya Pod tertentu yang akan diletakan di node tertentu yang bergantung juga dari kondisi serta kebutuhan yang spesifik. Dengan begitu, Taints dan Tolerations berkerja bersama untuk memastikan Pods tidak dischedule pada nodes yang tidak tepat. **Taints** ditambahkan pada node sedangkan **Tolerantions** didefiniskan dalam PodSpec. 
+Dalam kuberentes, Taints and Tolerations digunakan untuk mengontrol penjadwalan Pod ke node dalam cluster. Taints dan Tolerations berkerja bersama untuk memastikan Pods tidak dischedule pada nodes yang tidak tepat. **Taints** ditambahkan pada node sedangkan **Tolerantions** didefiniskan dalam PodSpec. Pod akan dischedule ke node jika Pod tersebut memiliki Toleration yang cocok dengan taint pada node tujuannya.
 
 Sebagai contoh, Kubernetes secara otomatis menambahkan **Taint** di master-nodes jadi hanya Pod khusus yang memanage control plane  yang akan dischedule di pada master-node tersebut dan tidak pada node lain seperti worker node. Ini dapat memastikan master-node menjalankan pod-pod control plane.
 
@@ -8,7 +8,7 @@ Sebagai contoh, Kubernetes secara otomatis menambahkan **Taint** di master-nodes
 
 ### Taints
 
-Taints ditambahkan ke node untuk memastikan bahwa pod tidak akan dijadwalkan/dischedule ke node tersebut, kecuali jika pod memiliki toleration yang sesuai. Taints digunakan untuk menandai node dengan atribut tertentu atau dengan limitasi, seperti hanya menggunakan nodes tertentu untuk workloads tertentu, atau mencegah Pod diletakan pada node yang memiliki karakteristik tertentu. Setiap taint  terdiri dari 3 bagian, yakni:
+Taints ditambahkan ke node untuk memastikan bahwa pod tidak akan dijadwalkan/dischedule ke node tersebut, kecuali jika pod memiliki toleration yang sesuai dengan taint pada node. Taints digunakan untuk menandai node dengan atribut tertentu atau dengan limitasi, seperti hanya menggunakan nodes tertentu untuk workloads tertentu, atau mencegah Pod diletakan pada node yang memiliki karakteristik tertentu. Setiap taint  terdiri dari 3 bagian, yakni:
 
 - **Key**: mewakili nama dari taints untuk mengidentifikasinya secara unique.
 - **Value**: disini bersifat opsional yang dimana terkait dengan **Key**.
@@ -77,3 +77,12 @@ Referensi:
 - https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 - https://medium.com/@prateek.malhotra004/demystifying-taint-and-toleration-in-kubernetes-controlling-the-pod-placement-with-precision-d4549c411c67
 - https://www.densify.com/kubernetes-autoscaling/kubernetes-taints/
+
+
+
+
+
+
+
+
+
