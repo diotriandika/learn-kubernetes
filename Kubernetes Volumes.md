@@ -9,4 +9,5 @@ Referensi:
 - https://kubernetes.io/docs/concepts/storage/volumes/
 - https://bluexp.netapp.com/blog/cvo-blg-5-types-of-kubernetes-volumes-and-how-to-work-with-them
 - https://kubernetes.io/docs/tasks/configure-pod-container/configure-volume-storage/
-- 
+- https://medium.com/@muppedaanvesh/a-hand-on-guide-to-kubernetes-volumes-%EF%B8%8F-b59d4d4e347f
+- https://medium.com/@islamsalah830/kubernetes-volume-types-669c4a12bf99
