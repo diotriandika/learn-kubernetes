@@ -13,16 +13,38 @@ Beberapa aplikasi membutuhkan penyimpanan tambahan namun tidak memperdulikan dat
 
 Kubernetes memiliki beberapa jenis dari Ephemeral Volume yang digunakan untuk kebutuhan masing2, yakni:
 
-- emptyDir
+- [emptyDir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
 
   Sesuai dengan namanya, emptyDir akan membuat direktori kosong ketika Pod hidup, dengan storage yang datang dari base directory kubelet (biasanya root disk) atau RAM. emptyDir akan dihapus ketika Pod dihentikan. emptyDir cocok untuk penyimpanan yang sifatnya sementara seperti cache yang dimana tidak diperlukan setelah Pod dihentikan.
 
-- 
+- [configMap](https://kubernetes.io/docs/concepts/storage/volumes/#configmap), [downwardAPI](https://kubernetes.io/docs/concepts/storage/volumes/#downwardapi) dan [secret]().
 
+  Ketiga jenis volumes diatas bekerja dengan menginject data kubernetes kedalam Pod.
 
+  Sedikit penjelasan mengenai ketiga jenis volume diatas:
+
+  - configMap: digunakan untuk menyimpan konfigurasi yang bersifat tidak rhasia seperti (key-value) yang dapat digunakan oleh Pod.
+  - downwardAPI: singkatnya ini adalah salah satu cara untuk mengekspos infromasi terkait Pod itu sendiri ke container. [Cek disini](https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/)
+  - secret: digunakan untuk menyimpan data sensitif seperti password, API token atau encryption key.
+
+- [CSI epehemeral volumes](https://kubernetes.io/docs/concepts/storage/ephemeral-volumes/#csi-ephemeral-volumes)
+
+  Secara konsep, CSI epehemeral volumes mirip dengan configMap, downwardAPI dan secret. Volume ini menggunakan driver CSI (Container Storage Interface) untuk menyediakan penyimpanan sementara untuk Pod tanpa memerlukan adanya PV (PersistentVolume) atau PVC (PersistentVolumeClaim). ??? well belum terlalu paham sih
+
+- [Generic Ephemeral Volumes](https://kubernetes.io/docs/concepts/storage/ephemeral-volumes/#generic-ephemeral-volumes)
+  Volumes ini mirip dengan emptyDir yang dimanan menyediakan direktori per-Pod dari nol dan biasanya kosong setelah dibuat. Akan tetapi Generic Ephemeral Volumes memiliki berberapa fitur tambahan, diantaranya:
+
+  - Penyimpanannya dalam lokal atau network-attached.
+  - Dapat menetapkan size dari volumes.
+  - Operasi khusus dalam volume dapat didukung karena diasumsikan bahwa drivernya mendukung. sperti snapshooting, cloning, resizing dan tracking kapasitas storage.
+
+emptyDir, configMap, downardAPI dan secret diatur oleh kubelet dalam setiap node dan disediakan sebagai [local ephemeral storage](https://kubernetes.io/docs/concepts/storage/ephemeral-volumes/), sedangkan CSI ephemeral storage harus disediakan oleh third-party storage drivernya CSI.
 
 Referensi :
 
 - https://kubernetes.io/docs/concepts/storage/ephemeral-volumes/
-- https://kubernetes.io/docs/concepts/storage/volumes/#emptydir
-- 
+
+### Persistent Volumes
+
+
+
