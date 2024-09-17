@@ -46,5 +46,17 @@ Referensi :
 
 ### Persistent Volumes
 
+Berbeda dengan Ephemeral Volumes, sesuai dengan namanya PersistentVolumes menyimpan data secara persistent yang dimana tidak mengikuti umur Pod. PersistentVolumes sub-system menyediakan API untuk user dan administrator yang mengabstraksikan detail dari bagaimana storage berasal dan bagaimana storage tersebut digunakan. Untuk itu kita menggunakan dua resources API yakni PersistentVolume dan PersistentVolumeClaim.
+
+- [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=A%20PersistentVolume%20(PV))
+
+  PersistentVolume atau PV adalah sebuah storage pool dalam cluster yang sudah disiapkan oleh administrator atau disiapkan secara dinamis menggunakan [StorageClasses](https://kubernetes.io/docs/concepts/storage/storage-classes/). PV digunakan oleh user untuk mendeploy aplikasi didalam cluster, PV bertindak sebagai sebuah resource dalam cluster layaknya seperti sebuah node didalam sebuah cluster resource. Users dapat memilih penyimpanan dari pool tersebut menggunakan PersistentVolumeClaim atau PVC.
+
+- [PersistentVolumeClaim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=A%20PersistentVolumeClaim%20(PVC))
+
+  
+
+### Penggunan Volume
+
 
 
