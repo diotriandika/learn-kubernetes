@@ -54,7 +54,23 @@ Berbeda dengan Ephemeral Volumes, sesuai dengan namanya PersistentVolumes menyim
 
 - [PersistentVolumeClaim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=A%20PersistentVolumeClaim%20(PVC))
 
-  
+  PersistentVolumeClaim atau PVC adalah sebuah permintaan storage yang dibuat oleh user atau aplikasi yang berjalan di cluster. Cara kerja PVC mirip dengan sebuah Pod. Pod menggunakan resource dari Node dan PVC menggunakan resource dari PV. Pods dapat meminta secara spesifik berapa resource yang diinginkan (cpu dan memory), dan PVC dapat meminta secara spesifik berapa size dan apa [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) storage.
+
+#### Lifecycle of a Volume and Claim
+
+PV merupakan resources didalam cluster dan PVC merupakan request untuk resources tersebut and juga bertugas untuk mengecek klaim ke resources tersebut. Interaksi diatara PV dan PVC mengikuti lifecycle dibawah
+
+#### Provisioning
+
+Terdapat 2 cara PV dapat disiapkan, secara statis atau dinamis.
+
+#### Static PV Provisioning
+
+
+
+Referensi:
+
+- https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 
 ### Penggunan Volume
 
