@@ -276,8 +276,24 @@ test test test
 
 Kita bisa lihat file yang sebelumnya dibuat masih ada di direktori pada node bahkan setelah Pod tersebut dihapus.
 
+> Note: Menggunakan hostPath sebagai penyimpanan di stage production sangatlah tidak di rekomendasikan karena seperti kita tahu sifat dari hostPath sangat terikat dengan Node tempat Pod dijalankan. Jika Pod direstart atau dipindahkan ke node lain maka Pod tidak lagi memiliki akses ke data yang tersimpan di volume hostPath sebelumnya. 
+
 Referensi:
 
 - https://kubernetes.io/docs/concepts/storage/volumes/#:~:text=the%20v1.26%20release.-,hostPath,-A%20hostPath%20volume
 - https://www.kubermatic.com/blog/keeping-the-state-of-apps-1-introduction-to-volume-and-volumemounts/
+
+### PersistentVolume (PV) and PersistentVolumeClaim (PVC)
+
+PersistentVolume dan PersistentVolumeClaim bekerja untuk membuat penyimpanan yang terbebas dari node, sehingga memungkinkan data dalam volume tersebut dapat diakses oleh Pod walaupun Pod tersebut dipindahkan ke Node lainnya. Namun tidak hanya itu saja, masih banyak keunggulan lain menggunakan kedua tipe volume ini seperti halnya adanya dynamic provisioner yang dapat mempermudah user dalam memanagemen storage.  
+
+Seperti yang sudah saya mention diatas, dalam menyiapkan PersistentVolume kita bisa melakukannya dengan 2 cara, yakni dengan Static Provisioning dan Dynamic Provisioning.
+
+#### Static Provisioning (Manual)
+
+Buat manifest untuk mendeploy PV terlebih dahulu
+
+```yaml
+
+```
 
