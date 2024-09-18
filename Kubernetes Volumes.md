@@ -66,11 +66,17 @@ Terdapat 2 cara PV dapat disiapkan, secara statis atau dinamis.
 
 #### Static PV Provisioning
 
-testtesttest
+Dalam Static PV Provisioning, seorang cluster administrator membuat bebrapa jumlah PV, membawa detail dari storage aslinya yang nantinya bisa digunakan oleh cluster users. PV akan ada di Kubernetes API dan tersedia untuk digunakan.
+
+#### Dynamic PV Provisioning
+
+
 
 Referensi:
 
 - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+- https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=working%20examples.-,Lifecycle%20of%20a%20volume%20and%20claim,-PVs%20are%20resources
+- https://www.squadcast.com/blog/introduction-to-kubernetes-storage
 
 ### Penggunan Volume
 
