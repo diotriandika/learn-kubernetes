@@ -70,13 +70,18 @@ Dalam Static PV Provisioning, seorang cluster administrator membuat bebrapa juml
 
 #### Dynamic PV Provisioning
 
+Ketika tidak ada satupun Static PV yang dibuat oleh administrator sesuai dengan PVC yang user buat, maka cluster akan mencoba secara dinamis  menyediakan sebuah volume yang secara khusus untuk PVC tersebut. Proses penyediaan ini bergantung dengan [StorageClasses](https://kubernetes.io/docs/concepts/storage/storage-classes/). PVC harus mereminta sebuah storage class dan administrator juga harus membuat serta mengkonfigurasi class tersebut agar dynamic provisioning terjadi. Claims yang merequest class kosong `""` secara otomatis akan mendisable dynamic provisioning untuk claims tersebut.
 
+#### StorageClasses
+
+Sebuah StorageClass menyediakan cara untuk administrator untuk mendeskripsikan classes dari storage yang mereka berikan. Class yang berbeda bisa digunakan untuk quality-of-service level atau backup policies yang ditentukan oleh cluster administrator. Konsep dari storage class ini mirip dengan `profiles` di sistem storage yang lain.
 
 Referensi:
 
 - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 - https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=working%20examples.-,Lifecycle%20of%20a%20volume%20and%20claim,-PVs%20are%20resources
 - https://www.squadcast.com/blog/introduction-to-kubernetes-storage
+- https://kubernetes.io/docs/concepts/storage/storage-classes/
 
 ### Penggunan Volume
 
