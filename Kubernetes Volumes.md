@@ -148,17 +148,17 @@ Coba untuk masuk kedalam Pod
 ## Exec into Pod
 $ kubectl exec -ti nginx-emptydir -- /bin/bash
 
-## Check the volume in /cache
-nginx-emptydir:/# cd /cache 
-nginx-emptydir:/cache# ls
+## Check the volume
+root@nginx-emptydir:/# cd /cache 
+root@nginx-emptydir:/cache# ls
 
 ## Create a file
-nginx-emptydir:/cache# cat << EOF | tee cache.file 
+root@nginx-emptydir:/cache# cat << EOF | tee cache.file 
 > this is caches
 > this is caches
 > this is caches
 > EOF
-nginx-emptydir:/cache# ls
+root@nginx-emptydir:/cache# ls
 cache.file
 ```
 
@@ -178,15 +178,106 @@ Masuk ke dalam Pod dan cek file yang dibuat tadi.
 ## Exec into Pod
 $ kubectl exec -ti nginx-emptydir -- /bin/bash
 
-## Check the file in /cache
-nginx-emptydir:/# cd /cache
-nginx-emptydir:/cache# ls
-nginx-emptydir:/cache#
+## Check the file
+root@nginx-emptydir:/# cd /cache
+root@nginx-emptydir:/cache# ls
+root@nginx-emptydir:/cache#
 ```
 
-Diatas kita bisa lihat bahwa file (cache) yang sebelumnya dibuat ikut terhapus ketika Pod mati  atau direstart. Itu adalah salah satu contoh dari penggunaan ephemeral volume tipe emptyDir.
+Diatas kita bisa lihat bahwa file (cache) yang sebelumnya dibuat ikut terhapus ketika Pod mati  atau direstart. Itu adalah salah satu contoh dari penggunaan ephemeral volume tipe emptyDir. untuk contoh lain bisa dibaca di [kubernetes.io](https://kubernetes.io/docs/concepts/storage/volumes/)
 
+Referensi:
 
+- https://kubernetes.io/docs/concepts/storage/volumes/
+- https://www.kubermatic.com/blog/keeping-the-state-of-apps-1-introduction-to-volume-and-volumemounts/
 
+### Persistent Volume
 
+Berbalik dengan ephemeral volume yang hanya menyediakan volume sementara yang mengikuti umur dari Pod, Persistent Volume seperti namanya memiliki sifat yang persisten dan akan tetap ada walau Pod sudah dihapus. Salah satu contoh yang paling mudah adalah menggunakan hostPath, yang dimana volume ini akan mounting sebuah direktori dari host node yang menjalankan Pod kedalam Pod tersebut.
+
+#### hostPath Example
+
+ Buat manifest untuk Pod dengan volume tipe hostPath.
+
+```bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-hostpath
+spec:
+  containers:
+  - name: my-app
+    image: nginx
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: my-volume
+      mountPath: /app
+  volumes:
+  - name: my-volume
+    hostPath:
+      path: /mnt/vpath 
+```
+
+Apply manifest tersebut lalu describe pod untuk melihat informasi terkait dimana Pod tersebut dideploy, volume yang digunakan  dan path dari volume dalam node.
+
+> Bisa menggunakan node selector jika ingin mendeploy Pod dinode tertentu.
+
+```bash
+$ kubectl describe pod nginx-hostpath
+Name:             nginx-hostpath
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             k8s-worker-2/10.20.1.21
+...
+    Mounts:
+      /app from nginx-volume (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-9rj5m (ro)
+...
+Volumes:
+  nginx-volume:
+    Type:          HostPath (bare host directory volume)
+    Path:          /mnt/hostpath
+```
+
+Coba masuk kedalam Pod
+
+```bash
+## Exec into Pod
+$ kubectl exec -ti nginx-hostpath -- /bin/bash
+
+## Move to mounted volume then create a file
+root@nginx-hostpath:/# cd /app
+root@nginx-hostpath:/app# echo "test test test" > hostpath.file
+root@nginx-hostpath:/app# ls
+hostpath.file
+```
+
+Kemudian coba masuk ke node worker letak Pod dideploy.
+
+```bash
+lnearher@k8s-worker-2:~$ cd /mnt/hostpath
+lnearher@k8s-worker-2:/mnt/hostpath$ ls | cat hostpath.file
+test test test
+```
+
+Bisa kita lihat bahwa file yang ada dalam Pod juga ada di direktori node. Selanjutnya coba untuk menghapus Pod tersebut dan cek apakah file tersebut masih ada atau ikut hilang seperti emptyDir.
+
+```bash
+## Delete Pod
+$ kubectl delete pod nginx-hostpath
+
+## SSH into Node that volume has mounted before
+lnearher@k8s-worker-2:~$ cd /mnt/hostpath
+lnearher@k8s-worker-2:/mnt/hostpath$ ls | cat hostpath.file
+test test test
+```
+
+Kita bisa lihat file yang sebelumnya dibuat masih ada di direktori pada node bahkan setelah Pod tersebut dihapus.
+
+Referensi:
+
+- https://kubernetes.io/docs/concepts/storage/volumes/#:~:text=the%20v1.26%20release.-,hostPath,-A%20hostPath%20volume
+- https://www.kubermatic.com/blog/keeping-the-state-of-apps-1-introduction-to-volume-and-volumemounts/
 
