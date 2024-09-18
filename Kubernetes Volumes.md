@@ -83,7 +83,110 @@ Referensi:
 - https://www.squadcast.com/blog/introduction-to-kubernetes-storage
 - https://kubernetes.io/docs/concepts/storage/storage-classes/
 
-### Penggunan Volume
+## Kuberentes Volumes Example
+
+Berikut adalah beberapa contoh menggunakan Volume pada Pod :)
+
+### Ephemeral Volumes
+
+Seperti yang dijelaskan diatas, ephemeral volume memiliki sifat yang tidak kekal atau keberadaanya menyesuaikan dengan umur dari Pod. Sehingga ini cocok digunakan untuk caching service. Type volume yang sering digunakan diantaranya emptyDir, configMap, downwardAPI, secrets dan generic ephemeral volumes.
+
+#### emptyDir Example
+
+Buat manifest untuk Pod, sebagai contoh dibawah saya menggunakan image `nginx`
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-emptydir
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  volumes:
+  - name: cache-volume
+    emptyDir:
+      sizeLimit: 10Mi
+```
+
+Diatas saya membuat volume untuk cache dengan nama `cache-volume` dan dimount dalam container kepath `/cache`.  Selanjutnya apply manifest tersebut dan describe Pod untuk melihat lebih detail terkait pod yang sudah dibuat.
+
+```bash
+$ kubectl describe pod nginx-emptydir
+Name:             nginx-emptydir
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             k8s-worker-2/10.20.1.21
+Start Time:       Wed, 18 Sep 2024 11:38:34 +0800
+Labels:           <none>
+Annotations:      cni.projectcalico.org/containerID: d28e715d42c4d4aa77536d7d955706b1148a23d0954049dff7e057dbb3dccfa6
+                  cni.projectcalico.org/podIP: 192.168.140.45/32
+                  cni.projectcalico.org/podIPs: 192.168.140.45/32
+Status:           Running
+...
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /cache from cache-volume (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-jtzhr (ro)
+...
+Volumes:
+  cache-volume:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  10Mi
+```
+
+Coba untuk masuk kedalam Pod
+
+```shell
+## Exec into Pod
+$ kubectl exec -ti nginx-emptydir -- /bin/bash
+
+## Check the volume in /cache
+nginx-emptydir:/# cd /cache 
+nginx-emptydir:/cache# ls
+
+## Create a file
+nginx-emptydir:/cache# cat << EOF | tee cache.file 
+> this is caches
+> this is caches
+> this is caches
+> EOF
+nginx-emptydir:/cache# ls
+cache.file
+```
+
+Sekarang coba untuk menhapus Pod tersebut kemudian jalankan lagi
+
+```shell
+## Delete Pod
+$ kubectl delete pod nginx-emptydir
+
+## Start Pod
+$ kubectl apply -f nginx-emptydir.yaml
+```
+
+Masuk ke dalam Pod dan cek file yang dibuat tadi.
+
+```shell
+## Exec into Pod
+$ kubectl exec -ti nginx-emptydir -- /bin/bash
+
+## Check the file in /cache
+nginx-emptydir:/# cd /cache
+nginx-emptydir:/cache# ls
+nginx-emptydir:/cache#
+```
+
+Diatas kita bisa lihat bahwa file (cache) yang sebelumnya dibuat ikut terhapus ketika Pod mati  atau direstart. Itu adalah salah satu contoh dari penggunaan ephemeral volume tipe emptyDir.
+
+
 
 
 
