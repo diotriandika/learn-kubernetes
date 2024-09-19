@@ -350,6 +350,12 @@ Export list for 10.20.1.1:
 
 > `10.20.1.1` adalah IP dari node NFS Server
 
+Buat subdir yang nantinya digunakan untuk membuat PV
+
+```bash
+$ sudo mkdir /mnt/nfs-data/nginx-pod
+```
+
 #### Step 2 - Using NFS Directory as PersistentVolume
 
 Buat manifest untuk mendeploy PV terlebih dahulu
@@ -390,12 +396,12 @@ Cek apakah PV dan PVC sudah berhasil dibuat
 
 ```bash
 $ kubectl get pv
-NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
-nfs-pv                                     5Gi        RWO            Retain           Available                                          <unset>                          2m43s 
+NAME     CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM               STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+nfs-pv   5Gi        RWX            Retain           Bound    default/nginx-pvc                  <unset>                          101s
 
 $ kubectl get pvc
-NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
-nginx-pvc       Bound    nginx-pv                                   10Gi        RWO            manual         <unset>  
+NAME        STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+nginx-pvc   Bound    nfs-pv   5Gi        RWX                           <unset>                 111s
 ```
 
 Jika status nya sudah `Bound` berarti PV dan PVC sudah saling terhubung
@@ -456,6 +462,14 @@ root@nginx-pod:/usr/share/nginx/html# curl localhost
 hello-world
 ```
 
+Bisa juga untuk mengecek apakah file tersebut ada di direktori NFS Server
 
+```bash
+## Move to exported directory
+$ cd /mnt/nfs-data/nginx-pod
+$ cat index.html
+hello-world
+```
 
 #### Dynamic Provisioning (NFS External Provisioner)
+
