@@ -426,7 +426,7 @@ spec:
         claimName: nginx-pvc
 ```
 
-Apply Pod kemudian describe Pod.
+Deploy Pod kemudian describe Pod.
 
 ```bash
 $ kubectl describe pod nginx-pod
@@ -477,7 +477,7 @@ Referensi:
 - https://hbayraktar.medium.com/how-to-setup-dynamic-nfs-provisioning-in-a-kubernetes-cluster-cbf433b7de29
 - https://www.geeksforgeeks.org/kubernetes-volume-provisioning-dynamic-vs-static/
 
-#### Dynamic Provisioning (NFS External Provisioner)
+#### Dynamic PV Provisioning (NFS External Provisioner)
 
 Dalam kubernetes kita bisa memanfaatkan sebuah object bernama StorageClass yang berguna untuk mengabstraksikan detail penyimpanan dan memfasilitasi proses dynamic provisioning storage. Untuk itu kita juga perlu yang namanya Provisioner, yakni bertugas untuk pembuatan dan managemen PV secara dinamis. 
 
@@ -505,7 +505,141 @@ $ helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.i
 $ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
     --set nfs.server=10.20.1.1 \
     --set nfs.path=/mnt/nfs-data
+NAME: nfs-subdir-external-provisioner
+LAST DEPLOYED: Thu Sep 19 15:02:01 2024
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
 ```
+
+> isi `nfs.server` dengan alamat dari NFS Server dan `nfs.path` dengan path direktori  yang diexport.
+
+Cek pod dan storage class
+
+```bash
+$ kubectl get pod
+NAME                                               READY   STATUS    RESTARTS   AGE
+nfs-subdir-external-provisioner-768fb68b44-q5tq8   1/1     Running   0          13s
+$ kubectl get sc
+NAME         PROVISIONER                                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+nfs-client   cluster.local/nfs-subdir-external-provisioner   Delete          Immediate           true                   30s
+```
+
+Di atas kita bisa lihat sudah ada sebuah StorageClass dengan nama `nfs-client`, kita bisa gunakan ini ketika ingin mengclaim volume.
+
+Buat manifest untuk PVC lalu apply
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-client
+  resources:
+    requests:
+      storage: 1Gi
+```
+
+> Pastikan untuk mencocokan storageClassName dengan storage class dari pv.
+
+Ketika sudah terdeploy, maka PV akan secara otomatis dibuat dan terhubung dengan PVC tersebut
+
+```bash
+## Check PV
+$ kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM             STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pvc-d26b26ef-d2ff-4332-aec8-91a5f7d88747   1Gi        RWO            Delete           Bound    default/nfs-pvc   nfs-client     <unset>
+
+## Check PVC
+NAME      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+nfs-pvc   Bound    pvc-d26b26ef-d2ff-4332-aec8-91a5f7d88747   1Gi        RWO            nfs-client     <unset>                 8s
+```
+
+Selanjutnya coba untuk membuat manifest dan gunakan claim yang sudah dibuat sebelumnya.
+
+```yaml]
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx-pod
+    image: nginx
+    volumeMounts:
+    - name: nginx-storage
+      mountPath: /usr/share/nginx/html
+  volumes:
+    - name: nginx-storage
+      persistentVolumeClaim:
+        claimName: nfs-pvc
+```
+
+Deploy pod kemudian describe Pod.
+
+```bash
+$ kubectl describe pod nginx-pod
+Name:             nginx-pod
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             k8s-worker-1/10.20.1.20
+...
+    Mounts:
+      /usr/share/nginx/html from nginx-storage (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dkg29 (ro)
+...
+Volumes:
+  nginx-storage:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  nfs-pvc
+    ReadOnly:   false
+```
+
+Kita bisa lihat disection Volumes bahwa Pod yang kita buat sudah menggunakan PV dengan PVC nginx-pvc.
+
+Kemudian masuk kedalam Pod untuk memastikan bahwa volume benar2 dapat digunakan.
+
+```bash
+## Exec into Pod
+$ kubectl exec -ti nginx-pod -- /bin/bash
+
+## Move to mounted volume then create a file
+root@nginx-pod:/# cd /app
+root@nginx-pod:/usr/share/nginx/html# echo "hello-world-nfs" > index.html
+root@nginx-pod:/usr/share/nginx/html# curl localhost
+hello-world-nfs
+```
+
+Bisa juga untuk mengecek apakah file tersebut ada di direktori NFS Server
+
+```bash
+## Move to exported directory
+$ cd /mnt/nfs-data/
+
+## List directory
+$ ls
+default-nfs-pvc-pvc-d26b26ef-d2ff-4332-aec8-91a5f7d88747
+
+## Move to created directory
+$ cd default-nfs-pvc-pvc-d26b26ef-d2ff-4332-aec8-91a5f7d88747
+
+## Check the file
+$ cat index.html
+hello-world-nfs
+```
+
+Seperti yang kita bisa lihat diatas, dengan menggunakan NFS Subdir External Provisioner  user tidak perlu lagi tahu bagaimana PV itu dibuat dan hanya perlu berinteraksi dengan PVC serta StorageClass yang dimiliki :)
+
+Referensi:
+
+- https://hbayraktar.medium.com/how-to-setup-dynamic-nfs-provisioning-in-a-kubernetes-cluster-cbf433b7de29
+- https://krupakarreddy-yasa.medium.com/kubernetes-storage-provisioning-f06545817762
+- https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
 
 
 
