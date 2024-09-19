@@ -471,5 +471,41 @@ $ cat index.html
 hello-world
 ```
 
+Referensi:
+
+- https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/
+- https://hbayraktar.medium.com/how-to-setup-dynamic-nfs-provisioning-in-a-kubernetes-cluster-cbf433b7de29
+- https://www.geeksforgeeks.org/kubernetes-volume-provisioning-dynamic-vs-static/
+
 #### Dynamic Provisioning (NFS External Provisioner)
+
+Dalam kubernetes kita bisa memanfaatkan sebuah object bernama StorageClass yang berguna untuk mengabstraksikan detail penyimpanan dan memfasilitasi proses dynamic provisioning storage. Untuk itu kita juga perlu yang namanya Provisioner, yakni bertugas untuk pembuatan dan managemen PV secara dinamis. 
+
+Disini saya menggunakan NFS External sebagai Provisioner berhubung saya sudah membuat NFS Server.
+
+#### Step 1 - Install NFS Client
+
+Install `nfs-common` di semua node dalam cluster, bisa menggunakan ansible atau multipane ssh dengan tmux.
+
+```bash
+## Install on all nodes
+$ sudo apt install nfs-common -y
+```
+
+#### Step 2 - Install and Configure NFS Client Provisioner
+
+Selanjutnya masuk ke tahap deploying NFS Subdir External Provisioner dalam cluster untuk mengotomasikan pembuatan dan managemen PersistentVolume (PV). 
+Dalam instalasi NFS Subdir External Provisioner, kalian bisa menggunakan Helm atau Kustomize.
+
+```bash
+## Add Helm charts for NFS
+$ helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+
+## Install NFS Subdir External Provisioner
+$ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+    --set nfs.server=10.20.1.1 \
+    --set nfs.path=/mnt/nfs-data
+```
+
+
 
