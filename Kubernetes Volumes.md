@@ -64,9 +64,9 @@ PV merupakan resources didalam cluster dan PVC merupakan request untuk resources
 
 Terdapat 2 cara PV dapat disiapkan, secara statis atau dinamis.
 
-#### Static PV Provisioning
+#### Static/Manual PV Provisioning
 
-Dalam Static PV Provisioning, seorang cluster administrator membuat bebrapa jumlah PV, membawa detail dari storage aslinya yang nantinya bisa digunakan oleh cluster users. PV akan ada di Kubernetes API dan tersedia untuk digunakan.
+Static PV provisioning dalam kuberentes berarti alokasi dan konfigurasi storage dilakukan secara manual sebelum volume tersebut digunakan Pod. Static PV Provisioning memerlukan administrator untuk mengalokasikan resource storage yang nantinya akan digunakan oleh Pod menggunakan  PVC untuk melakukan request.
 
 #### Dynamic PV Provisioning
 
@@ -82,6 +82,7 @@ Referensi:
 - https://kubernetes.io/docs/concepts/storage/persistent-volumes/#:~:text=working%20examples.-,Lifecycle%20of%20a%20volume%20and%20claim,-PVs%20are%20resources
 - https://www.squadcast.com/blog/introduction-to-kubernetes-storage
 - https://kubernetes.io/docs/concepts/storage/storage-classes/
+- https://www.geeksforgeeks.org/kubernetes-volume-provisioning-dynamic-vs-static/
 
 ## Kuberentes Volumes Example
 
@@ -206,17 +207,15 @@ metadata:
   name: nginx-hostpath
 spec:
   containers:
-  - name: my-app
+  - name: nginx
     image: nginx
-    ports:
-    - containerPort: 8080
     volumeMounts:
-    - name: my-volume
+    - name: nginx-volume
       mountPath: /app
   volumes:
-  - name: my-volume
+  - name: nginx-volume
     hostPath:
-      path: /mnt/vpath 
+      path: /mnt/hostpath
 ```
 
 Apply manifest tersebut lalu describe pod untuk melihat informasi terkait dimana Pod tersebut dideploy, volume yang digunakan  dan path dari volume dalam node.
@@ -285,15 +284,178 @@ Referensi:
 
 ### PersistentVolume (PV) and PersistentVolumeClaim (PVC)
 
-PersistentVolume dan PersistentVolumeClaim bekerja untuk membuat penyimpanan yang terbebas dari node, sehingga memungkinkan data dalam volume tersebut dapat diakses oleh Pod walaupun Pod tersebut dipindahkan ke Node lainnya. Namun tidak hanya itu saja, masih banyak keunggulan lain menggunakan kedua tipe volume ini seperti halnya adanya dynamic provisioner yang dapat mempermudah user dalam memanagemen storage.  
+PersistentVolume dan PersistentVolumeClaim bekerja untuk membuat penyimpanan yang terbebas dari node, sehingga memungkinkan data dalam volume tersebut dapat diakses oleh Pod walaupun Pod tersebut dipindahkan ke Node lainnya. Namun tidak hanya itu saja, masih banyak keunggulan lain menggunakan kedua tipe volume ini seperti halnya penyimpanan yang terpusat (tidak terikat pada node host yang menjalankan Pod), adanya dynamic provisioner yang dapat mempermudah user dalam memanagemen storage dll.
 
 Seperti yang sudah saya mention diatas, dalam menyiapkan PersistentVolume kita bisa melakukannya dengan 2 cara, yakni dengan Static Provisioning dan Dynamic Provisioning.
 
-#### Static Provisioning (Manual)
+#### Static PV Provisioning Example
+
+Static PersistentProvisioning berarti administrator membuat PV terlebih dahulu secara manual, kemudian nantinya PV tersebut bisa digunakan oleh Pod melalui PersistentVolumeClaim. PV ini tidak terikat pada node, sehingga bisa menggunakan network storage seperti NFS. 
+
+Sebagai contoh saya mengunakan NFS sebagai backend network-based storage.
+
+#### Step 1 - Setup NFS Server
+
+Install NFS Server di pada node yang diiginkan (bisa node diluar cluster)
+
+```bash
+## Update packages repository
+$ sudo apt-get update
+
+## Install nfs-common and nfs-kernel-server
+$ sudo apt install nfs-common nfs-kernel-server -y
+```
+
+Buat direktori yang akan dishare, nantinya akan digunakan oleh PV
+
+```bash
+## Create export directory
+$ sudo mkdir /mnt/nfs-data
+
+## Set directory privileges
+$ sudo chown nobody:nogroup /data/nfs-data
+$ sudo chmod 2770 /data/nfs-data
+```
+
+Export directory yang sudah dibuat
+
+```bash
+$ sudo vim /etc/exports
+```
+
+```ini
+## Add these following lines
+/mnt/nfs-data   10.20.1.0/24(rw,sync,no_subtree_check)
+```
+
+> - `/mnt/nfs-data` direktori yang diexport
+> - `10.20.1.0/24` network yang digunakan untuk share
+
+```bash
+$ sudo exportfs -av
+exporting 10.20.1.0/24:/mnt/nfs-data
+```
+
+Restart NFS Server kemudian cek detail dari direktori yang diexport
+
+```bash
+## Restart NFS Server
+$ sudo systemctl restart nfs-kernel-server
+
+## Show export details
+$ /sbin/showmount -e 10.20.1.1
+Export list for 10.20.1.1:
+/mnt/nfs-data 10.20.1.0/24
+```
+
+> `10.20.1.1` adalah IP dari node NFS Server
+
+#### Step 2 - Using NFS Directory as PersistentVolume
 
 Buat manifest untuk mendeploy PV terlebih dahulu
 
 ```yaml
-
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /mnt/nfs-data
+    server: 10.20.1.1
 ```
 
+Buat manifest lagi untuk membuat Claims yang nantinya digunakan Pod kemudian apply
+
+```yaml 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: nfs-pv
+```
+
+Cek apakah PV dan PVC sudah berhasil dibuat
+
+```bash
+$ kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                   STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+nfs-pv                                     5Gi        RWO            Retain           Available                                          <unset>                          2m43s 
+
+$ kubectl get pvc
+NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+nginx-pvc       Bound    nginx-pv                                   10Gi        RWO            manual         <unset>  
+```
+
+Jika status nya sudah `Bound` berarti PV dan PVC sudah saling terhubung
+
+Selanjutnya buat manfiest untuk Pod, dan dibawah `spec.volumes` tambahkan line `persistentVolumeClaim` untuk menggunakan claim.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  containers:
+  - name: nginx-pod
+    image: nginx
+    volumeMounts:
+    - name: nginx-storage
+      mountPath: /usr/share/nginx/html
+  volumes:
+    - name: nginx-storage
+      persistentVolumeClaim:
+        claimName: nginx-pvc
+```
+
+Apply Pod kemudian describe Pod.
+
+```bash
+$ kubectl describe pod nginx-pod
+Name:             nginx-pod
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             k8s-worker-1/10.20.1.20
+...
+    Mounts:
+      /usr/share/nginx/html from nginx-storage (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dkg29 (ro)
+...
+Volumes:
+  nginx-storage:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  nginx-pvc
+    ReadOnly:   false
+```
+
+Kita bisa lihat disection Volumes bahwa Pod yang kita buat sudah menggunakan PV dengan PVC nginx-pvc.
+
+Kemudian kita bisa masuk kedalam Pod untuk memastikan bahwa volume benar2 dapat digunakan.
+
+```bash
+## Exec into Pod
+$ kubectl exec -ti nginx-pod -- /bin/bash
+
+## Move to mounted volume then create a file
+root@nginx-pod:/# cd /app
+root@nginx-pod:/usr/share/nginx/html# echo "hello-world" > index.html
+root@nginx-pod:/usr/share/nginx/html# curl localhost
+hello-world
+```
+
+
+
+#### Dynamic Provisioning (NFS External Provisioner)
