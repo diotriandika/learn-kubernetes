@@ -19,6 +19,7 @@ Topology:
 
 ![image](https://github.com/user-attachments/assets/dbb21e5e-14f4-49d7-a355-8f42dce666e6)
 
+> Note!! Topologi diatas belum termasuk HA karena node load-balancer hanya terdapat 1. Jika Node load-balancer down maka satu cluster akan lumpuh. Maka sangat disarankan untuk menggunakan setidaknya 2 load-balancer. Diatas karena saya juga kekurangan resource dilab sehingga saya menggunakan 1 load-balancer. Nanti gunakan VIP dari KeepAlived untuk ngehit API kubernetes.
 ## Setup Load Balancer
 
 Load balancer disini diperlukan untuk memproses semua traffic masuk kedalam cluster. Dalam konteks untuk ini, saya menggunakan HAProxy sebagai loadbalancer untuk membagi traffic ke semua control planes. Dan jika salah satu control plane mati, aplikasi tetap bisa diakses karena HAProxy secara otomatis mengalihkan semua traffic ke available server.
