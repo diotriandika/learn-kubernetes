@@ -1,4 +1,4 @@
-# Apa itu Kubernetes?
+# Apa itu Kubernetes? (LAMA) blum dibenerin lagi.
 
 Kubernetes adalah platform Orkestrasi Container opensource yang dapat membantu dalam managemen containerized workloads dan services. Kubernetes dapat mengotomasikan pekerjaan seperti menyebarkan, mengubah specs, dan mengelola aplikasi yang berjalan dicontainer.
 
@@ -36,7 +36,6 @@ Kubernetes adalah aplikasi untuk automation deployment, scaling, dan manajemen a
 
 - Pod tidak bisa running di Node yang berbeda
 
-  > ![image-20240704185919619](C:\Users\Dio Tri Andika\AppData\Roaming\Typora\typora-user-images\image-20240704185919619.png)
 
 ### Labels
 
