@@ -134,7 +134,7 @@ mkdir -p /etc/containerd
 containerd config default | sudo tee /etc/containerd/config.toml
 ```
 
-Selanjutnya set containerd configuration file diatas agar  `cgroupDriver` untuk runc diset ke systemd yang mana nantinya diperlukan oleh kubelet.
+Selanjutnya rubah file containerd configuration diatas agar mengaktifkan `cgroupDriver` untuk runc yang mana nantinya diperlukan oleh kubelet.
 
 ```bash
 sed -i '/SystemdCgroup/s/false/true/g' /etc/containerd/config.toml
@@ -146,7 +146,7 @@ Restart containerd dan cek apakah containerd sudah berjalan atau tidak serta ena
 # restart containerd service
 sudo systemctl restart containerd
 
-# check containerd status & enable automatic startup while system boot
+# check containerd status & enable automatic startup on system boot
 sudo systemctl status containerd
 sudo systemctl enable --now containerd
 ```
