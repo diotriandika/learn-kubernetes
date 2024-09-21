@@ -172,7 +172,7 @@ Dalam menginisasi/memulai sebuah cluster kubernetes diperlukan 3 tool yang wajib
 > - Kubectl adalah sebuah command-line tool yang digunakan untuk berkomunikasi dengan Kubernetes Cluster  Control Plane. [Lengkapnya disini.](https://kubernetes.io/docs/reference/kubectl/)
 > - Kubelet adalah sebuah `node-agent` yang nantinya berjalan disetiap worker-node dalam cluster. Kubelet memastikan container beroperasi didalam Pod. [Lengkapnya disini.](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)
 
-Untuk melakukan instalasti ketiga tools diatas, download public signing key untuk package repository kubernetes kemudian tampahkan apt repository kubernetes.
+Untuk melakukan instalasi ketiga tools diatas, download public signing key untuk package repository kubernetes kemudian tambahkan apt repository kubernetes.
 
 ```bash
 # Download public signing key kubernetes
