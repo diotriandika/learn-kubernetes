@@ -8,4 +8,10 @@ Object Storage atau object-based storage adalah salah satu jenis arsitektur peny
 
 ## MinIO Installation
 
+Instalasi MinIO bisa diinstall di NFS-Server untuk mempermudah akses. Dibawah saya hanya memberikan demo untuk single-node single-drive MinIO server ke kubernetes. Dalam production sangat direkomendasikan untuk menggunakan MinIO Operator.
 
+### Step 1 - NFS Server Preparation
+
+Siapkan Node khusus sebagai NFS Server tempat meletakan shared directory yang nantinya digunakan oleh MinIO.
+
+1. 
