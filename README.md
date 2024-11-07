@@ -1,52 +1,56 @@
-# Apa itu Kubernetes? (LAMA) blum dibenerin lagi.
+### **Apa itu Kubernetes?**
+Kubernetes adalah platform orkestrasi container open-source yang digunakan untuk mengotomatisasi deployment, scaling, dan pengelolaan aplikasi yang berjalan dalam container. Dengan Kubernetes, kita dapat dengan mudah mengelola aplikasi yang terdiri dari banyak container, menyediakan platform yang sangat skalabel, efisien, dan dapat dipelihara. Kubernetes memungkinkan kita untuk menjalankan aplikasi dalam lingkungan yang terdistribusi, memantau statusnya, dan mengelola update serta scaling secara otomatis.
 
-Kubernetes adalah platform Orkestrasi Container opensource yang dapat membantu dalam managemen containerized workloads dan services. Kubernetes dapat mengotomasikan pekerjaan seperti menyebarkan, mengubah specs, dan mengelola aplikasi yang berjalan dicontainer.
+### **Komponen Kubernetes Master**
+Kubernetes memiliki beberapa komponen utama yang bekerja sama untuk mengelola dan mengontrol cluster kita. Diantaranya adalah:
 
-Kubernetes adalah aplikasi untuk automation deployment, scaling, dan manajemen aplikasi berbasis container.
+1. **kube-api-server**  
+   API Server adalah titik interaksi utama antara kita (pengguna atau sistem lain) dengan Kubernetes. Semua perintah yang kita berikan ke Kubernetes, baik untuk mendirikan pod, deployment, scaling, dan konfigurasi lainnya, akan dikirim melalui API Server ini. Kube-api-server memastikan komunikasi yang konsisten dan aman di seluruh komponen dalam cluster.
 
-### Kubernetes Master
+2. **etcd**  
+   Etcd adalah database distributed yang menyimpan seluruh data konfigurasi dan state dari Kubernetes cluster kita. Setiap perubahan dalam status atau konfigurasi cluster (seperti pengaturan pod, deployment, atau service) disimpan dalam etcd. Data ini sangat penting karena Kubernetes mengandalkan etcd untuk menjaga konsistensi dan integritas cluster.
 
-- kube-api-server betugas sebagai API yang digunakan untuk berinteraksi dengan Kubernetes Cluster
-- etcd betugas untuk sebagai database untuk menyimpan data Kubernetes Cluster
-- kube-scheduler bertugas memperhatikan aplikasi yang akan kita jalankan dan meminta Node untuk menjalankan aplikasi tersebut.
-- kube-controller-manager bertugas melakukan kontrol terhadap node-node Kubernetes Cluster.
-- cloud-controller-manager bertugas untuk melakukan kontrol terhadap interaksi dengan cloud provider.
+3. **kube-scheduler**  
+   Kube-scheduler adalah komponen yang bertugas untuk memutuskan di mana pod akan dijalankan dalam cluster. Ia memilih node yang sesuai berdasarkan berbagai faktor, seperti ketersediaan resource, aturan penjadwalan, dan toleransi node. Dengan scheduler ini, kita bisa memastikan aplikasi kita berjalan di tempat yang tepat.
 
-### Kubernetes Worker/Nodes
+4. **kube-controller-manager**  
+   Kube-controller-manager bertugas untuk menjaga agar kondisi yang diinginkan dalam cluster tetap sesuai. Misalnya, jika kita ingin memastikan bahwa ada 3 replika pod yang berjalan pada setiap saat, controller akan terus memonitor dan memastikan bahwa jumlah pod tetap terjaga dengan melakukan penambahan atau pengurangan jika diperlukan.
 
-- kubelet berjalan di setiap Node dan betugas untuk memastikan bahwa aplikasi kita berjalan di Node.
-- kube-proxy berjalan di setiap Node dan bertugas sebagai proxy terhadap arus network yang masuk ke aplikasi kita dan sebagai load balancer juga.
-- container-manager bejalan di setiap Node dan bertugas sebagai container manager. Kubernetes mendukung beberapa container manager seperti Docker, containerd, cri-o, rklet, dan yang lainnya.
+5. **cloud-controller-manager**  
+   Jika kita menjalankan Kubernetes di atas platform cloud (seperti AWS, Azure, atau Google Cloud), cloud-controller-manager mengelola interaksi Kubernetes dengan penyedia layanan cloud. Misalnya, ia bertanggung jawab untuk mengelola node dalam cloud atau integrasi storage dengan cloud provider.
 
+### **Komponen Kubernetes Worker / Nodes**
+Node adalah mesin tempat aplikasi (dalam bentuk pod) dijalankan. Setiap node dalam Kubernetes memiliki beberapa komponen yang memastikan bahwa aplikasi kita berjalan dengan baik:
 
+1. **kubelet**  
+   Kubelet adalah agen yang berjalan di setiap node. Tugas utamanya adalah memastikan bahwa pod yang didefinisikan dalam Kubernetes cluster berjalan dengan baik di node tersebut. Kubelet memonitor status container dan pod, serta memastikan bahwa semuanya sesuai dengan konfigurasi yang sudah ditentukan.
 
-## Apa itu Node?
+2. **kube-proxy**  
+   Kube-proxy berfungsi untuk menangani lalu lintas jaringan masuk dan keluar dari pod. Ia juga melakukan load balancing untuk memastikan bahwa trafik dialihkan dengan merata ke pod yang tersedia. Misalnya, jika kita memiliki beberapa pod yang menyediakan layanan yang sama, kube-proxy akan mengatur agar trafik yang masuk dapat dibagi dengan baik antara pod-pod tersebut.
 
-- Node adalah worker machine di Kubernetes, sebelumnya ada yang menyebutnya Minion.
-- Node bisa saja dalam bentuk VM atau Mesin Fisik
-- Di dalam Node selalu terdapat Kubelet, kube-proxy dan container manager.
+3. **container manager**  
+   Container manager bertugas mengelola lifecycle container dalam node. Kubernetes mendukung berbagai container manager, seperti **Docker**, **containerd**, dan **CRI-O**. Komponen ini mengurus pembuatan, pengelolaan, dan penghapusan container dalam node.
 
-## Apa itu Pod?
+### **Apa itu Node?**
+Node adalah mesin (baik mesin fisik atau virtual) dalam Kubernetes yang menjalankan pod-pod. Node bertanggung jawab untuk menyediakan resource (CPU, memori, penyimpanan) yang dibutuhkan oleh pod untuk berfungsi. Dalam sebuah cluster, kita dapat memiliki beberapa node yang masing-masing memiliki pod yang berbeda.
 
-- Pod adalah unit terkecil yang bisa dideploy di Kubernetes Cluster
+- Node dibagi menjadi dua jenis: **Master node** (yang mengelola kontrol dan pengaturan cluster) dan **Worker node** (yang menjalankan aplikasi dalam bentuk pod).
+- Setiap node selalu memiliki komponen penting seperti kubelet, kube-proxy, dan container manager.
 
-- Pod berisi satu atau lebih container
+### **Apa itu Pod?**
+Pod adalah unit terkecil yang dapat dideploy dalam Kubernetes. Pod bisa berisi satu atau lebih container yang berjalan bersama di dalam satu lingkungan. Container-container dalam pod ini berbagi IP, volume storage, dan namespace, yang memungkinkan mereka berkomunikasi dengan lancar.
 
-- Secara sederhana Pod adalah aplikasi kita yang running di Kubernetes Cluster.
+- **Pod bisa berisi lebih dari satu container** yang saling berkomunikasi dan berbagi resource.
+- **Pod tidak dapat berjalan di node yang berbeda**. Semua container dalam satu pod dijadwalkan untuk berjalan pada node yang sama, yang memungkinkan mereka berbagi konfigurasi dan resource secara langsung
 
-- Pod tidak bisa running di Node yang berbeda
+### **Labels dalam Kubernetes**
+Labels adalah metadata yang digunakan untuk memberi identifikasi atau tanda pada objek-objek di Kubernetes, seperti pod, service, replication controller, dan lainnya. Dengan menggunakan labels, kita bisa mengelompokkan objek-objek tersebut berdasarkan kriteria tertentu, serta melakukan pencarian atau seleksi.
 
+**Manfaat Labels**:
+- Labels memudahkan kita untuk mengorganisir dan mencari pod berdasarkan kriteria tertentu.
+- Labels juga memungkinkan kita untuk melakukan kontrol lebih lanjut, seperti memilih pod tertentu untuk dilakukan scaling atau update.
 
-### Labels
-
-Kenapa butuh label?
-
-- Untuk memberi tanda pada Pod
-- Untuk mempermudah orgranisir Pod
-- Memberi infromasi tambahan pada Pod\
-- Labl tidak hanya bisa digunakan pada pod, tapi pada semua resource di Kubernetes, seperti Replication Controller, Replicas Set, Service, dan lain lain.
-
-Contoh menggunakan Label pada Pod
+**Contoh penggunaan label pada pod**:
 
 ```yaml
 apiVersion: v1
@@ -54,8 +58,8 @@ kind: Pod
 metadata:
   name: nginx-pod-labels
   labels:
-    name: nginx-labels
-    environment: testing
+    app: nginx
+    environment: production
 spec:
   containers:
     - name: nginx
@@ -64,52 +68,30 @@ spec:
         - containerPort: 80
 ```
 
-Kita bisa cek labels pada Pod dengan
+Untuk menampilkan label pada pod, kita dapat menggunakan perintah berikut:
 
 ```bash
-$ kubectl get pod --show-labels
-NAME               READY   STATUS    RESTARTS   AGE   LABELS
-nginx-pod          1/1     Running   0          39m   <none>
-nginx-pod-labels   1/1     Running   0          13s   environment=testing,name=nginx-labels
+$ kubectl get pods --show-labels
 ```
 
-Salah satu kegunaan label biasanya digunakan untuk mencari Pod, sebagai contoh saya ingin mencari Pod dengan key environment productions
+Untuk mencari pod berdasarkan label:
 
 ```bash
-$ kubectl get pod --show-labels
-NAME                READY   STATUS    RESTARTS   AGE   LABELS
-nginx-pod           1/1     Running   0          60m   <none>
-nginx-pod-labels    1/1     Running   0          21m   environment=testing,name=nginx-labels
-nginx-pod-labels2   1/1     Running   0          67s   environment=productions,name=nginx-labels
+$ kubectl get pods -l environment=production
 ```
 
-diatas terlihat bahwa pod dengan label `environment=productions` adalah `nginx-pod-labels2`. Selanjutnya saya bisa mencari pod2 dengan label tersebut dengan cara
+---
 
-```bash
-$ kubectl get pod -l environment=productions
-NAME                READY   STATUS    RESTARTS   AGE
-nginx-pod-labels2   1/1     Running   0          3m9s
-```
+### **Annotation dalam Kubernetes**
+Annotations berfungsi untuk menambahkan metadata atau informasi lebih rinci pada objek, namun tidak seperti labels, annotations **tidak dapat difilter atau dicari**. Biasanya, annotations digunakan untuk menyimpan informasi besar atau deskriptif, seperti metadata aplikasi, versi, atau informasi debug.
 
-maka yang muncul hanyalah pod yang memiliki label tersebut.
-
-### Annotation
-
-Untuk apa Annotation?
-
-- Annotation mirip dengan Label, hanya saja tidak dapat difilter atau diquery seperti label
-- Biasanya annotation digunakan untuk menambahkan informasi tambahan dalam ukuran besar
-- Annotation bisa menampung informasi sampai 256kb
-
-Contoh menggunakan Annotation pada Pod:
+**Contoh penggunaan annotation pada pod**:
 
 ```yaml
-apiVersion: v1 
-kind: Pod 
+apiVersion: v1
+kind: Pod
 metadata:
   name: nginx-pod-annotation
-  labels:
-    team: ceker-ayam
   annotations:
     description: Aplikasi ini dikembangkan oleh tim ceker-ayam
 spec:
@@ -120,81 +102,52 @@ spec:
         - containerPort: 80
 ```
 
-Kita bisa cek annotations dari sebuah Pod dengan menggunakan `kubectl describe pod <pod-name>`
+Untuk melihat annotation pada pod, kita bisa menggunakan:
 
 ```bash
 $ kubectl describe pod nginx-pod-annotation
-Name:             nginx-pod-annotation
-Namespace:        default
-Priority:         0
-Service Account:  default
-Node:             kube-pzn-cluster/192.168.59.112
-Start Time:       Sat, 20 Jul 2024 13:36:37 +0800
-Labels:           team=ceker-ayam
-Annotations:      description: Aplikasi ini dikembangkan oleh tim ceker-ayam
-Status:           Running
-IP:               10.244.0.3
 ```
 
-Diatas kita bisa melihat Annotations yang kita sisipkan pada pod nignx-pod-annotation. 
+Jika kita ingin menambahkan annotation:
 
-Kita juga bisa menambahkan annotation pada Pod dengan menggunakan `kubectl annotate pod <pod-name> key="value" `
+```bash
+$ kubectl annotate pod <pod-name> key="value"
+```
 
-### Namespace
+### **Namespace dalam Kubernetes**
+Namespace digunakan untuk mengelompokkan dan memisahkan berbagai resource dalam cluster Kubernetes. Ini sangat berguna terutama ketika kita memiliki banyak tim yang bekerja dalam satu cluster atau ketika kita ingin memisahkan berbagai lingkungan (seperti development, staging, dan production).
 
-Kapan menggunakan Namespace?
+**Kapan menggunakan Namespace**:
+- Ketika jumlah resource dalam cluster terlalu besar dan perlu dipisahkan untuk organisasi yang lebih baik.
+- Untuk memisahkan resource antar tim, aplikasi, atau lingkungan.
 
-- Ketika resources di Kubernetes sudah terlalu banyak
-- Ketika butuh memisahkan resources untuk multi-tenant, team atau environment.
-- Nama resources bisa sama jika berada di namespace yang berbeda
-
-Untuk melihat namespace kita bisa menggunakan `kubectl get namespaces`
+**Contoh melihat namespaces**:
 
 ```bash
 $ kubectl get namespaces
-NAME              STATUS   AGE
-default           Active   56m
-kube-node-lease   Active   56m
-kube-public       Active   56m
-kube-system       Active   56m
 ```
 
-Jika kita membuat resource tanpa mendefinisikan Namespace, kubernetes akan memasukan resource tersebut ke namespace `default`.
+Jika kita membuat resources tanpa menentukan namespace, Kubernetes akan menempatkannya pada namespace **default**.
 
-Untuk melihat namespace pada sebuah resource, kita bisa menggunakan `kubectl describe`
-
-```bash 
-$ kubectl describe pod nginx-pod-annotation
-Name:             nginx-pod-annotation
-Namespace:        default
-Priority:         0
-Service Account:  default
-```
-
-Kita juga bisa melihat list pod yang ada disebuah namespace dengan cara menggunakan `kubectl get --namespace <namespace-name>`
+Untuk melihat resource dalam namespace tertentu:
 
 ```bash
-$ kubectl get --namespace default
-NAME                   READY   STATUS    RESTARTS   AGE
-nginx-pod-annotation   1/1     Running   0          39m
+$ kubectl get pods --namespace <namespace-name>
 ```
 
-### Probe
+### **Probe dalam Kubernetes**
+Probe adalah mekanisme yang digunakan untuk memeriksa status kesehatan aplikasi dalam pod. Tiga jenis probe yang digunakan dalam Kubernetes adalah:
 
-Probe merupakan pengecekan **nanti cari lengkapnya**
+1. **Liveness Probe**  
+   Digunakan untuk mengecek apakah aplikasi dalam pod masih berjalan. Jika liveness probe gagal, Kubernetes akan merestart pod tersebut.
 
-#### Liveness, Readiness & Startup Probe
+2. **Readiness Probe**  
+   Menentukan apakah pod siap menerima trafik. Jika readiness probe gagal, Kubernetes akan menghentikan pengiriman trafik ke pod tersebut hingga probe berhasil.
 
-- Kubelet menggunakan liveness probe untuk mengecek kapan perlu merestart Pod.
-- Misal saat liveness probe pada Pod tidak merespon, kubelet akan secara otomatis me-restart Pod.
-- Kubelet menggunakan readiness probe untuk mengecek apakah Pod siap menerima traffic.
-- Kubelet menggunakan startup probe untuk mengecek apakah Pod sudah berjalan. Jika belum berjalan, maka kubelet tidak akan menggunakan pengecekan liveness dan readiness.
-- Startup Probe cocok untuk Pod yang membutuhkan proses startup yang lama, ini dapat digunakan untuk memastikan Pod tidak mati oleh kubelet sebelum selesai berjalan dengan sa.
+3. **Startup Probe**  
+   Startup probe digunakan untuk aplikasi yang membutuhkan waktu lama untuk startup. Jika aplikasi belum siap, Kubernetes tidak akan menjalankan pengecekan liveness atau readiness terlalu cepat.
 
-Di kubernetes, terdapat 3 mekanisme pengecekan Probe, yakni:
-
-- HTTP Get
-- TCP Socket
-- Command Exec
-
-
+**Jenis pengecekan probe**:
+- **HTTP Get**: Melakukan permintaan HTTP GET ke endpoint aplikasi dalam pod.
+- **TCP Socket**: Memeriksa koneksi TCP ke aplikasi dalam pod.
+- **Exec**: Menjalankan perintah dalam container untuk memeriksa status aplikasi.
