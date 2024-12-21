@@ -1,5 +1,5 @@
 ### **Apa itu Kubernetes?**
-Kubernetes adalah platform orkestrasi container open-source yang digunakan untuk mengotomatisasi deployment, scaling, dan pengelolaan aplikasi yang berjalan dalam container. Dengan Kubernetes, kita dapat dengan mudah mengelola aplikasi yang terdiri dari banyak container, menyediakan platform yang sangat skalabel, efisien, dan dapat dipelihara. Kubernetes memungkinkan kita untuk menjalankan aplikasi dalam lingkungan yang terdistribusi, memantau statusnya, dan mengelola update serta scaling secara otomatis.
+Kubernetes adalah platform orkestrasi container open-source yang digunakan untuk otomasi proses deployment, scaling, dan pengelolaan aplikasi yang berjalan dalam container. Dengan Kubernetes, kita dapat dengan mudah mengelola aplikasi yang terdiri dari banyak container, menyediakan platform yang sangat scalable, dan efisien. Kubernetes memungkinkan kita untuk menjalankan aplikasi dalam lingkungan yang terdistribusi, memantau statusnya, dan mengelola update serta scaling secara otomatis.
 
 ### **Komponen Kubernetes Master**
 Kubernetes memiliki beberapa komponen utama yang bekerja sama untuk mengelola dan mengontrol cluster kita. Diantaranya adalah:
